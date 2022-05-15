@@ -2,10 +2,12 @@ package com.leonid.game;
 
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.viewport.ExtendViewport;
 import com.leonid.game.domain.customer.Customer;
 import com.leonid.game.domain.kiosk.Kiosk;
@@ -21,7 +23,7 @@ import static com.badlogic.gdx.utils.ScreenUtils.clear;
 @Component
 public class Game extends ApplicationAdapter {
 
-	public static final int WIDTH = 1080;
+	public static final int WIDTH = 1080 * 5;
 	public static final int HEIGHT = WIDTH / 4 * 3;
 
 
@@ -36,6 +38,7 @@ public class Game extends ApplicationAdapter {
 	private BitmapFont font;
 	private ExtendViewport viewport;
 	private ShapeRenderer shapeRenderer;
+	private ZoomInputProccesor zoomInputProccesor;
 
 	@Override
 	public void create() {
@@ -49,11 +52,15 @@ public class Game extends ApplicationAdapter {
 		renderController.setShapeRenderer(shapeRenderer);
 		renderController.setBatch(batch);
 		renderController.setFont(font);
+
+		zoomInputProccesor = new ZoomInputProccesor(camera);
+		zoomInputProccesor.init();
+		Gdx.input.setInputProcessor(zoomInputProccesor);
 	}
 
 	@Override
 	public void render() {
-		processRestart();
+		processInput();
 		setProjectionMatrix();
 		draw();
 		tic();
@@ -92,9 +99,55 @@ public class Game extends ApplicationAdapter {
 	private void processRestart() {
 		if (Gdx.input.isKeyJustPressed(R)) {
 			context.reinit();
+			zoomInputProccesor.init();
 			camera.position.set(camera.viewportWidth / 2, camera.viewportHeight / 2, 0);
 		}
 	}
+
+	private void processInput() {
+		processRestart();
+		processCameraControl();
+	}
+
+	private void processZoom() {
+		boolean mKeyPressed = Gdx.input.isKeyJustPressed(Input.Keys.M);
+		boolean nKeyPressed = Gdx.input.isKeyJustPressed(Input.Keys.N);
+
+		if (mKeyPressed || nKeyPressed) {
+			zoomInputProccesor.checkZoom(mKeyPressed ? Input.Keys.M : Input.Keys.N);
+		}
+	}
+
+	private void processCameraControl() {
+		processZoom();
+		processCameraPosition();
+
+		camera.update();
+	}
+
+	private void processCameraPosition() {
+		if (Gdx.input.isKeyJustPressed(Input.Keys.C)) {
+			camera.position.set(new Vector3());
+		}
+
+		int move = 50;
+		if (Gdx.input.isKeyPressed(Input.Keys.W)) {
+			camera.position.set(camera.position.x, camera.position.y + move, camera.position.z);
+		}
+
+		if (Gdx.input.isKeyPressed(Input.Keys.S)) {
+			camera.position.set(camera.position.x, camera.position.y - move, camera.position.z);
+		}
+
+
+		if (Gdx.input.isKeyPressed(Input.Keys.A)) {
+			camera.position.set(camera.position.x - move, camera.position.y, camera.position.z);
+		}
+		if (Gdx.input.isKeyPressed(Input.Keys.D)) {
+			camera.position.set(camera.position.x + move, camera.position.y, camera.position.z);
+		}
+	}
+
 
 	@Override
 	public void dispose() {

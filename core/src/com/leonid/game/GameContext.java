@@ -43,14 +43,14 @@ public class GameContext {
     private final CustomerGenerator customerGenerator;
     private final GameCalculator gameCalculator;
     private final Random random = new Random();
-    private int kiosksCount;
-    private int customersCount;
+    private int kiosksGenerationCount;
+    private int customersGenerationCount;
 
     @Autowired
     private ApplicationContext app;
     @Autowired
     private Config config;
-    private LocalTime autoReinitAt;
+    private LocalTime autoReInitAt;
 
 
     public GameContext(EntitiesHolder holder,
@@ -70,15 +70,19 @@ public class GameContext {
     }
 
     private void generateKiosks() {
-        int configKiosksCount = config.getKiosksCount();
+        kiosksGenerationCount = getKiosksGenerationCount();
+        for (int i = 0; i < kiosksGenerationCount; i++) {
+            generateKiosk();
+        }
+    }
+
+    private int getKiosksGenerationCount() {
+        int configKiosksCount = config.getKiosksGenerationCount();
 
         if (configKiosksCount == -1) {
-            kiosksCount = random.nextInt(9) + 5;
+            return random.nextInt(9) + 5;
         } else {
-            kiosksCount = configKiosksCount;
-        }
-        for (int i = 0; i < kiosksCount; i++) {
-            generateKiosk();
+            return configKiosksCount;
         }
     }
 
@@ -92,8 +96,16 @@ public class GameContext {
     }
 
     private void generateCustomers() {
-        customersCount = Math.max(kiosksCount, random.nextInt(kiosksCount * 5));
-        generateCustomers(customersCount);
+        customersGenerationCount = getCustomerGenerationCount();
+        generateCustomers(getCustomerGenerationCount());
+    }
+
+    private int getCustomerGenerationCount() {
+        if (config.getCustomerGenerationCount() == -1) {
+            return Math.max(kiosksGenerationCount, random.nextInt(Math.round(kiosksGenerationCount * config.getCustomerGenerationKioskCoef())));
+        } else {
+            return config.getCustomerGenerationCount();
+        }
     }
 
     private void generateCustomers(int customersCount) {
@@ -121,7 +133,7 @@ public class GameContext {
 
     private void clear() {
         holder.clear();
-        autoReinitAt = null;
+        autoReInitAt = null;
     }
 
     public void tic() {
@@ -129,14 +141,14 @@ public class GameContext {
 
         recalcCustomerCount();
 
-        checkAutoReinit();
+        checkAutoReInit();
 
         generateCustomersRandomly();
     }
 
     private void generateCustomersRandomly() {
-        if (random.nextInt(config.getProbabilityBound()) < 1 && kiosksCount > 0) {
-            generateCustomers(random.nextInt(kiosksCount * (random.nextInt(5) + 1)));
+        if (random.nextInt(config.getProbabilityBound()) < 1 && kiosksGenerationCount > 0) {
+            generateCustomers(getCustomerGenerationCount());
         }
     }
 
@@ -169,13 +181,12 @@ public class GameContext {
         return holder.getContext(customer);
     }
 
-    private void checkAutoReinit() {
-        if (autoReinitAt != null && LocalTime.now().isAfter(autoReinitAt)) {
-            autoReinitAt = null;
+    private void checkAutoReInit() {
+        if (autoReInitAt != null && LocalTime.now().isAfter(autoReInitAt)) {
+            autoReInitAt = null;
             reinit();
         }
     }
-
 
     @EventListener
     public void onApplicationEvent(CustomerProcessedEvent event) {
@@ -184,12 +195,11 @@ public class GameContext {
         holder.remove(customer);
     }
 
-
     @EventListener
     public void onApplicationEvent(KioskDeadEvent event) {
 
-        if (isEveryKioskDead() && autoReinitAt == null) {
-            autoReinitAt = LocalTime.now().plusMinutes(1);
+        if (isEveryKioskDead() && autoReInitAt == null) {
+            autoReInitAt = LocalTime.now().plusMinutes(1);
         }
     }
 

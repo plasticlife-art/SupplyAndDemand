@@ -15,6 +15,7 @@ public class Kiosk implements HasPhysics {
     private Color color;
     private KioskStatus status;
     private int level;
+    private int size = 25;
 
     public Kiosk(Long id, Position position, Price price) {
         this.id = id;
@@ -39,7 +40,7 @@ public class Kiosk implements HasPhysics {
 
     @Override
     public int getSize() {
-        return 25;
+        return size;
     }
 
     @Override
@@ -73,6 +74,7 @@ public class Kiosk implements HasPhysics {
 
     public void levelUp() {
         level++;
+        this.size *= 1.2;
     }
 
     public int getLevel() {

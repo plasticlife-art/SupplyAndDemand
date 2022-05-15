@@ -64,10 +64,14 @@ public class KioskProcessingState implements State<KioskContext> {
             }
         }
 
-        if (context.getCustomersCount() >= 50) {
+        if (isOverloaded(context)) {
             app.getBean(KioskDeadState.class, context);
             eventPublisher.publishEvent(new KioskDeadEvent(this));
         }
+    }
+
+    private boolean isOverloaded(KioskContext context) {
+        return context.getCustomersCount() >= 50 * (1 + 0.5 * (context.getMaster().getLevel() - 1));
     }
 
     private long getProcessingTime(KioskContext context) {

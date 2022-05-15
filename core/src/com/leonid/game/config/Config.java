@@ -13,17 +13,19 @@ import org.springframework.context.annotation.PropertySource;
 @PropertySource("classpath:app.properties")
 public class Config {
 
-    private int kiosksCount;
+    private int kiosksGenerationCount;
+    private int customerGenerationCount;
     private int probabilityBound;
     private int processingSeconds;
     private int levelThreshold;
+    private float customerGenerationKioskCoef;
 
-    public int getKiosksCount() {
-        return kiosksCount;
+    public int getKiosksGenerationCount() {
+        return kiosksGenerationCount;
     }
 
-    public void setKiosksCount(int kiosksCount) {
-        this.kiosksCount = kiosksCount;
+    public void setKiosksGenerationCount(int kiosksGenerationCount) {
+        this.kiosksGenerationCount = kiosksGenerationCount;
     }
 
     public int getProbabilityBound() {
@@ -48,5 +50,21 @@ public class Config {
 
     public void setLevelThreshold(int levelThreshold) {
         this.levelThreshold = levelThreshold;
+    }
+
+    public int getCustomerGenerationCount() {
+        return customerGenerationCount;
+    }
+
+    public void setCustomerGenerationCount(int customerGenerationCount) {
+        this.customerGenerationCount = customerGenerationCount;
+    }
+
+    public float getCustomerGenerationKioskCoef() {
+        return customerGenerationKioskCoef;
+    }
+
+    public void setCustomerGenerationKioskCoef(float customerGenerationKioskCoef) {
+        this.customerGenerationKioskCoef = customerGenerationKioskCoef;
     }
 }
