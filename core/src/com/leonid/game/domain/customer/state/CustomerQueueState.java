@@ -1,7 +1,9 @@
-package com.leonid.game.domain.customer;
+package com.leonid.game.domain.customer.state;
 
 import com.leonid.game.calc.GameCalculator;
 import com.leonid.game.domain.common.State;
+import com.leonid.game.domain.customer.Customer;
+import com.leonid.game.domain.customer.CustomerContext;
 import com.leonid.game.domain.kiosk.Kiosk;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
@@ -36,7 +38,7 @@ public class CustomerQueueState implements State<CustomerContext> {
 
     public CustomerQueueState(CustomerContext customerContext) {
         this.inQueue = LocalTime.now();
-        customerContext.getCustomer().setCustomerStatus(QUEUE);
+        customerContext.getMaster().setCustomerStatus(QUEUE);
     }
 
     @Override
@@ -47,7 +49,7 @@ public class CustomerQueueState implements State<CustomerContext> {
     }
 
     private void goToAnotherKiosk(CustomerContext customerContext) {
-        Customer customer = customerContext.getCustomer();
+        Customer customer = customerContext.getMaster();
 
         customer.setKiosk(calcNewBestKiosk(customer));
 

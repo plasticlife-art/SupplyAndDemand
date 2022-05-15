@@ -1,9 +1,11 @@
-package com.leonid.game.domain.kiosk;
+package com.leonid.game.domain.kiosk.state;
 
 import com.badlogic.gdx.graphics.Color;
 import com.leonid.game.config.Config;
 import com.leonid.game.domain.common.State;
 import com.leonid.game.domain.customer.CustomerContext;
+import com.leonid.game.domain.kiosk.KioskContext;
+import com.leonid.game.domain.kiosk.KioskDeadState;
 import com.leonid.game.event.CustomerProcessedEvent;
 import com.leonid.game.event.KioskDeadEvent;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,8 +42,8 @@ public class KioskProcessingState implements State<KioskContext> {
         this.startTime = LocalTime.now();
         this.context = context;
         context.setState(this);
-        context.getKiosk().setStatus(PROCESSING);
-        context.getKiosk().setColor(Color.DARK_GRAY);
+        context.getMaster().setStatus(PROCESSING);
+        context.getMaster().setColor(Color.DARK_GRAY);
         processingCustomer = context.getProcessingCustomer();
     }
 
@@ -52,7 +54,7 @@ public class KioskProcessingState implements State<KioskContext> {
 
             if (customerContext == null) return; //todo
 
-            eventPublisher.publishEvent(new CustomerProcessedEvent(this, customerContext.getCustomer()));
+            eventPublisher.publishEvent(new CustomerProcessedEvent(this, customerContext.getMaster()));
 
             CustomerContext nextCustomer = context.getProcessingCustomer();
             if (nextCustomer != null) {
@@ -69,7 +71,7 @@ public class KioskProcessingState implements State<KioskContext> {
     }
 
     private long getProcessingTime(KioskContext context) {
-        return NANOS_PER_SECOND * config.getProcessingSeconds() / context.getKiosk().getLevel();
+        return NANOS_PER_SECOND * config.getProcessingSeconds() / context.getMaster().getLevel();
     }
 
     private boolean inProcessingFor(long nanos) {

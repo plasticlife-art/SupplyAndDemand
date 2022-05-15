@@ -17,8 +17,8 @@ public class KioskDeadState implements State<KioskContext> {
 
     public KioskDeadState(KioskContext context) {
         context.setState(this);
-        context.getKiosk().setColor(RED);
-        context.getKiosk().setStatus(DEAD);
+        context.getMaster().setColor(RED);
+        context.getMaster().setStatus(DEAD);
     }
 
     @Override

@@ -1,6 +1,7 @@
-package com.leonid.game.domain.kiosk;
+package com.leonid.game.domain.kiosk.state;
 
 import com.leonid.game.domain.common.State;
+import com.leonid.game.domain.kiosk.KioskContext;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
@@ -17,8 +18,8 @@ public class KioskWaitingState implements State<KioskContext> {
 
     public KioskWaitingState(KioskContext context) {
         context.setState(this);
-        context.getKiosk().setColor(YELLOW);
-        context.getKiosk().setStatus(WAITING);
+        context.getMaster().setColor(YELLOW);
+        context.getMaster().setStatus(WAITING);
     }
 
     @Override

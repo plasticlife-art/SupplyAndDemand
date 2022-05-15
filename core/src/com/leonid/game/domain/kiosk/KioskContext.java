@@ -1,5 +1,6 @@
 package com.leonid.game.domain.kiosk;
 
+import com.leonid.game.domain.common.Context;
 import com.leonid.game.domain.common.State;
 import com.leonid.game.domain.customer.CustomerContext;
 
@@ -12,7 +13,7 @@ import static java.util.stream.Collectors.toList;
 /**
  * @author Leonid Cheremshantsev
  */
-public class KioskContext {
+public class KioskContext implements Context<Kiosk> {
 
     private final Kiosk kiosk;
     private Queue<CustomerContext> customerQueue = new LinkedList<>();
@@ -24,7 +25,7 @@ public class KioskContext {
         this.kiosk = kiosk;
     }
 
-    public Kiosk getKiosk() {
+    public Kiosk getMaster() {
         return kiosk;
     }
 
@@ -73,7 +74,7 @@ public class KioskContext {
 
     private void cleanQueue() {
         List<CustomerContext> toRemove = customerQueue.stream()
-                .filter(customerContext -> !customerContext.getCustomer().getKiosk().equals(kiosk))
+                .filter(customerContext -> !customerContext.getMaster().getKiosk().equals(kiosk))
                 .collect(toList());
 
         customerQueue.removeAll(toRemove);

@@ -6,15 +6,17 @@ import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
-import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.utils.viewport.ExtendViewport;
+import com.leonid.game.domain.customer.Customer;
 import com.leonid.game.domain.kiosk.Kiosk;
-import com.leonid.game.view.KioskRenderer;
+import com.leonid.game.view.RenderController;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Component;
 
 import static com.badlogic.gdx.Input.Keys.R;
+import static com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType.Filled;
+import static com.badlogic.gdx.utils.ScreenUtils.clear;
 
 @Component
 public class Game extends ApplicationAdapter {
@@ -27,7 +29,8 @@ public class Game extends ApplicationAdapter {
 	private GameContext context;
 	@Autowired
 	private EntitiesHolder entitiesHolder;
-
+	@Autowired
+	private RenderController renderController;
 	private OrthographicCamera camera;
 	private SpriteBatch batch;
 	private BitmapFont font;
@@ -42,33 +45,48 @@ public class Game extends ApplicationAdapter {
 		viewport = new ExtendViewport(WIDTH, HEIGHT, camera);
 		shapeRenderer = new ShapeRenderer();
 		shapeRenderer.setAutoShapeType(true);
+
+		renderController.setShapeRenderer(shapeRenderer);
+		renderController.setBatch(batch);
+		renderController.setFont(font);
 	}
 
 	@Override
 	public void render() {
 		processRestart();
-
-		batch.setProjectionMatrix(camera.combined);
-
+		setProjectionMatrix();
 		draw();
+		tic();
+	}
 
+	private void tic() {
 		context.tic();
 	}
 
-	private void draw() {
-		ScreenUtils.clear(1, 1, 1, 1);
+	private void setProjectionMatrix() {
+		batch.setProjectionMatrix(camera.combined);
 		shapeRenderer.setProjectionMatrix(camera.combined);
-		shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
+	}
+
+	private void draw() {
+		clear(1, 1, 1, 1);
+		shapeRenderer.begin(Filled);
 		entitiesHolder.getEntities().forEachRemaining(entity -> {
 			if (entity instanceof Kiosk) {
-				getKioskRenderer().render(context.getKioskContext((Kiosk) entity));
-			} else {
-				shapeRenderer.setColor(entity.getColor());
-				shapeRenderer.circle(entity.getPosition().getX(), entity.getPosition().getY(), entity.getSize());
+				drawKiosk((Kiosk) entity);
+			} else if (entity instanceof Customer) {
+				drawCustomer(((Customer) entity));
 			}
-
 		});
 		shapeRenderer.end();
+	}
+
+	private void drawCustomer(Customer entity) {
+		renderController.render(context.getContext(entity));
+	}
+
+	private void drawKiosk(Kiosk entity) {
+		renderController.render(context.getContext(entity));
 	}
 
 	private void processRestart() {
@@ -90,9 +108,18 @@ public class Game extends ApplicationAdapter {
 		shapeRenderer.setProjectionMatrix(camera.combined);
 	}
 
+	@Bean
+	public ShapeRenderer shapeRenderer() {
+		return shapeRenderer;
+	}
 
 	@Bean
-	public KioskRenderer getKioskRenderer() {
-		return new KioskRenderer(shapeRenderer, batch, font);
+	public SpriteBatch spriteBatch() {
+		return batch;
+	}
+
+	@Bean
+	public BitmapFont bitmapFont() {
+		return font;
 	}
 }

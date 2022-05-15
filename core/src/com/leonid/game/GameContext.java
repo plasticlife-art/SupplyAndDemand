@@ -3,13 +3,14 @@ package com.leonid.game;
 
 import com.leonid.game.calc.GameCalculator;
 import com.leonid.game.config.Config;
+import com.leonid.game.domain.common.HasPhysics;
 import com.leonid.game.domain.customer.Customer;
 import com.leonid.game.domain.customer.CustomerContext;
-import com.leonid.game.domain.customer.CustomerTransitionState;
+import com.leonid.game.domain.customer.state.CustomerTransitionState;
 import com.leonid.game.domain.kiosk.Kiosk;
 import com.leonid.game.domain.kiosk.KioskContext;
-import com.leonid.game.domain.kiosk.KioskProcessingState;
-import com.leonid.game.domain.kiosk.KioskWaitingState;
+import com.leonid.game.domain.kiosk.state.KioskProcessingState;
+import com.leonid.game.domain.kiosk.state.KioskWaitingState;
 import com.leonid.game.event.CustomerProcessedEvent;
 import com.leonid.game.event.KioskDeadEvent;
 import com.leonid.game.generator.CustomerGenerator;
@@ -21,8 +22,7 @@ import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
 import java.time.LocalTime;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.Iterator;
 import java.util.Random;
 
 import static com.leonid.game.Game.HEIGHT;
@@ -42,11 +42,7 @@ public class GameContext {
     private final KioskGenerator kioskGenerator;
     private final CustomerGenerator customerGenerator;
     private final GameCalculator gameCalculator;
-
     private final Random random = new Random();
-
-    private final Map<Customer, CustomerContext> customerContexts = new HashMap<>();
-    private final Map<Kiosk, KioskContext> kioskContexts = new HashMap<>();
     private int kiosksCount;
     private int customersCount;
 
@@ -92,7 +88,7 @@ public class GameContext {
 
         KioskContext kioskContext = new KioskContext(kiosk);
         kioskContext.setState(app.getBean(KioskWaitingState.class, kioskContext));
-        kioskContexts.put(kiosk, kioskContext);
+        holder.addEntity(kioskContext);
     }
 
     private void generateCustomers() {
@@ -115,7 +111,7 @@ public class GameContext {
 
         customerContext.setCustomerState(app.getBean(CustomerTransitionState.class, customerContext));
 
-        customerContexts.put(customer, customerContext);
+        holder.addEntity(customerContext);
     }
 
     public void reinit() {
@@ -125,14 +121,11 @@ public class GameContext {
 
     private void clear() {
         holder.clear();
-        customerContexts.clear();
-        kioskContexts.clear();
         autoReinitAt = null;
     }
 
     public void tic() {
-        customerContexts.values().forEach(CustomerContext::tic);
-        kioskContexts.values().forEach(KioskContext::tic);
+        holder.ticContexts();
 
         recalcCustomerCount();
 
@@ -152,7 +145,7 @@ public class GameContext {
             if (entity instanceof Customer) {
                 Customer customer = (Customer) entity;
                 KioskContext kioskContext = getContext(customer.getKiosk());
-                if (kioskContext == null || kioskContext.getKiosk() == null) {
+                if (kioskContext == null || kioskContext.getMaster() == null) {
                     return;
                 }
                 CustomerContext customerContext = getContext(customer);
@@ -161,19 +154,19 @@ public class GameContext {
                     kioskContext.putCustomer(customerContext);
                 }
 
-                if (kioskContext.getKiosk().getStatus() == WAITING && kioskContext.getProcessingCustomer() != null) {
+                if (kioskContext.getMaster().getStatus() == WAITING && kioskContext.getProcessingCustomer() != null) {
                     kioskContext.setState(app.getBean(KioskProcessingState.class, kioskContext));
                 }
             }
         });
     }
 
-    private CustomerContext getContext(Customer customer) {
-        return customerContexts.get(customer);
+    public CustomerContext getContext(Customer customer) {
+        return holder.getContext(customer);
     }
 
-    private KioskContext getContext(Kiosk customer) {
-        return kioskContexts.get(customer);
+    public KioskContext getContext(Kiosk customer) {
+        return holder.getContext(customer);
     }
 
     private void checkAutoReinit() {
@@ -183,16 +176,12 @@ public class GameContext {
         }
     }
 
-    public KioskContext getKioskContext(Kiosk kiosk) {
-        return getContext(kiosk);
-    }
 
     @EventListener
     public void onApplicationEvent(CustomerProcessedEvent event) {
         Customer customer = event.getCustomer();
 
         holder.remove(customer);
-        customerContexts.remove(customer);
     }
 
 
@@ -205,6 +194,17 @@ public class GameContext {
     }
 
     private boolean isEveryKioskDead() {
-        return kioskContexts.keySet().stream().anyMatch(kiosk -> kiosk.getStatus() != DEAD);
+        Iterator<HasPhysics> entities = holder.getEntities();
+        while (entities.hasNext()) {
+            HasPhysics entity = entities.next();
+
+            if (entity instanceof Kiosk) {
+                Kiosk kiosk = (Kiosk) entity;
+                if (kiosk.getStatus() != DEAD) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 }

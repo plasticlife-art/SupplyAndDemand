@@ -1,7 +1,9 @@
-package com.leonid.game.domain.customer;
+package com.leonid.game.domain.customer.state;
 
 import com.badlogic.gdx.math.Vector2;
 import com.leonid.game.domain.common.State;
+import com.leonid.game.domain.customer.Customer;
+import com.leonid.game.domain.customer.CustomerContext;
 import com.leonid.game.domain.kiosk.Kiosk;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
@@ -22,14 +24,14 @@ public class CustomerTransitionState implements State<CustomerContext> {
     private ApplicationContext app;
 
     public CustomerTransitionState(CustomerContext customerContext) {
-        customerContext.getCustomer().setCustomerStatus(TRANSITION);
+        customerContext.getMaster().setCustomerStatus(TRANSITION);
     }
 
     @Override
     public void tic(CustomerContext customerContext) {
-        if (customerContext.getCustomer().getKiosk() == null) return;
+        if (customerContext.getMaster().getKiosk() == null) return;
 
-        Customer customer = customerContext.getCustomer();
+        Customer customer = customerContext.getMaster();
         Kiosk kiosk = customer.getKiosk();
 
         if (hasSamePosition(customer, kiosk)) {
