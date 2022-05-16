@@ -1,6 +1,7 @@
 package com.leonid.game.calc;
 
 import com.leonid.game.EntitiesHolder;
+import com.leonid.game.config.Config;
 import com.leonid.game.domain.common.HasPhysics;
 import com.leonid.game.domain.common.Position;
 import com.leonid.game.domain.customer.Customer;
@@ -21,8 +22,22 @@ import static java.lang.Math.sqrt;
 @Component
 public class GameCalculator {
 
+
+    public static final long NANOS_PER_SECOND = 1000_000_000L;
+
     @Autowired
     private EntitiesHolder holder;
+    @Autowired
+    private Config config;
+
+    public int getKioskMaxQueue(Kiosk kiosk) {
+        return Math.round(config.getKioskDefaultMaxQueue() * (1 + (kiosk.getLevel() * kiosk.getLevel() - 1) * config.getKioskMaxQueueToLevelMultiplier()));
+    }
+
+
+    public long getKioskProcessingTime(Kiosk kiosk) {
+        return Math.round(NANOS_PER_SECOND * config.getKioskProcessingTimeDefaultSeconds() / (1 + (kiosk.getLevel() * kiosk.getLevel() - 1) * config.getKioskProcessingTimeToLevelMultiplier()));
+    }
 
     public Kiosk calcBestKioskExcept(Customer customer, Kiosk exception) {
         ArrayList<Kiosk> kiosks = new ArrayList<>(getKiosks());

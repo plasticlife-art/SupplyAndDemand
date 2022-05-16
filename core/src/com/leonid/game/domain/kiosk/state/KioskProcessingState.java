@@ -1,6 +1,7 @@
 package com.leonid.game.domain.kiosk.state;
 
 import com.badlogic.gdx.graphics.Color;
+import com.leonid.game.calc.GameCalculator;
 import com.leonid.game.config.Config;
 import com.leonid.game.domain.common.State;
 import com.leonid.game.domain.customer.CustomerContext;
@@ -26,30 +27,27 @@ import static com.leonid.game.domain.kiosk.KioskStatus.PROCESSING;
 @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
 public class KioskProcessingState implements State<KioskContext> {
 
-    public static final long NANOS_PER_SECOND = 1000_000_000L;
     @Autowired
     private ApplicationContext app;
     @Autowired
     private ApplicationEventPublisher eventPublisher;
     @Autowired
     private Config config;
+    @Autowired
+    private GameCalculator calculator;
 
-    private final KioskContext context;
     private final LocalTime startTime;
-    private final CustomerContext processingCustomer;
 
     public KioskProcessingState(KioskContext context) {
         this.startTime = LocalTime.now();
-        this.context = context;
         context.setState(this);
         context.getMaster().setStatus(PROCESSING);
         context.getMaster().setColor(Color.DARK_GRAY);
-        processingCustomer = context.getProcessingCustomer();
     }
 
     @Override
     public void tic(KioskContext context) {
-        if (inProcessingFor(getProcessingTime(context))) {
+        if (inProcessingFor(calculator.getKioskProcessingTime(context.getMaster()))) {
             CustomerContext customerContext = context.processCustomer();
 
             if (customerContext == null) return; //todo
@@ -71,15 +69,7 @@ public class KioskProcessingState implements State<KioskContext> {
     }
 
     private boolean isOverloaded(KioskContext context) {
-        return context.getCustomersCount() >= getMaxQueue();
-    }
-
-    public int getMaxQueue() {
-        return config.getKioskDefaultMaxQueue() * (1 + config.getKioskMaxQueueToLevelMultiplier() * (context.getMaster().getLevel() - 1));
-    }
-
-    private long getProcessingTime(KioskContext context) {
-        return Math.round(NANOS_PER_SECOND * config.getKioskProcessingTimeDefaultSeconds() / (context.getMaster().getLevel() * config.getKioskProcessingTimeToLevelMultiplier()));
+        return context.getCustomersCount() >= calculator.getKioskMaxQueue(context.getMaster());
     }
 
     private boolean inProcessingFor(long nanos) {

@@ -57,6 +57,10 @@ public class RenderController {
                 return -1;
             } else if (o2 instanceof Customer) {
                 return 1;
+            } else if (o1 instanceof Home && o2 instanceof Kiosk) {
+                return -1;
+            } else if (o1 instanceof Kiosk && o2 instanceof Home) {
+                return 1;
             } else {
                 return 0;
             }

@@ -109,6 +109,7 @@ public class GameContext {
         holder.addEntity(kiosk);
 
         KioskContext kioskContext = new KioskContext(kiosk);
+        kioskContext.setKioskMaxLevel(config.getKioskMaxLevel());
         kioskContext.setState(app.getBean(KioskWaitingState.class, kioskContext));
         holder.addEntity(kioskContext);
     }

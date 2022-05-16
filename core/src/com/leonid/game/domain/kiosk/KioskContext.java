@@ -20,6 +20,7 @@ public class KioskContext implements Context<Kiosk> {
 
     private State<KioskContext> state;
     private long processed = 0;
+    private int kioskMaxLevel;
 
     public KioskContext(Kiosk kiosk) {
         this.kiosk = kiosk;
@@ -52,7 +53,7 @@ public class KioskContext implements Context<Kiosk> {
             processed++;
         }
 
-        if (processed % 50 == 0) {
+        if (processed % 50 == 0 && kiosk.getLevel() < getKioskMaxLevel()) {
             kiosk.levelUp();
         }
 
@@ -78,5 +79,13 @@ public class KioskContext implements Context<Kiosk> {
                 .collect(toList());
 
         customerQueue.removeAll(toRemove);
+    }
+
+    public int getKioskMaxLevel() {
+        return kioskMaxLevel;
+    }
+
+    public void setKioskMaxLevel(int kioskMaxLevel) {
+        this.kioskMaxLevel = kioskMaxLevel;
     }
 }

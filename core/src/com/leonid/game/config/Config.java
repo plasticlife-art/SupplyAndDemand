@@ -16,14 +16,17 @@ import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
 public class Config {
 
     private int kiosksGenerationCount;
+    private int kioskMaxLevel;
     private int kioskProcessingTimeDefaultSeconds;
     private float kioskProcessingTimeToLevelMultiplier;
-    private int kioskMaxQueueToLevelMultiplier;
+    private float kioskMaxQueueToLevelMultiplier;
     private int kioskDefaultMaxQueue;
 
     private int generationHomeCount;
     private float generationCustomerPerHomePerTime;
     private Long generationCustomerTime;
+    private int customerToGoToAnotherKioskPercent;
+    private int customerWaitingTime;
 
     @Bean
     public ThreadPoolTaskScheduler threadPoolTaskScheduler() {
@@ -75,11 +78,11 @@ public class Config {
         this.generationCustomerTime = generationCustomerTime;
     }
 
-    public int getKioskMaxQueueToLevelMultiplier() {
+    public float getKioskMaxQueueToLevelMultiplier() {
         return kioskMaxQueueToLevelMultiplier;
     }
 
-    public void setKioskMaxQueueToLevelMultiplier(int kioskMaxQueueToLevelMultiplier) {
+    public void setKioskMaxQueueToLevelMultiplier(float kioskMaxQueueToLevelMultiplier) {
         this.kioskMaxQueueToLevelMultiplier = kioskMaxQueueToLevelMultiplier;
     }
 
@@ -97,5 +100,29 @@ public class Config {
 
     public void setKioskProcessingTimeToLevelMultiplier(float kioskProcessingTimeToLevelMultiplier) {
         this.kioskProcessingTimeToLevelMultiplier = kioskProcessingTimeToLevelMultiplier;
+    }
+
+    public int getKioskMaxLevel() {
+        return kioskMaxLevel;
+    }
+
+    public void setKioskMaxLevel(int kioskMaxLevel) {
+        this.kioskMaxLevel = kioskMaxLevel;
+    }
+
+    public int getCustomerToGoToAnotherKioskPercent() {
+        return customerToGoToAnotherKioskPercent;
+    }
+
+    public void setCustomerToGoToAnotherKioskPercent(int customerToGoToAnotherKioskPercent) {
+        this.customerToGoToAnotherKioskPercent = customerToGoToAnotherKioskPercent;
+    }
+
+    public int getCustomerWaitingTime() {
+        return customerWaitingTime;
+    }
+
+    public void setCustomerWaitingTime(int customerWaitingTime) {
+        this.customerWaitingTime = customerWaitingTime;
     }
 }

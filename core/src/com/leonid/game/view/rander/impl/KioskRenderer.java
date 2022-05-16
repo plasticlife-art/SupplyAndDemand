@@ -1,10 +1,12 @@
 package com.leonid.game.view.rander.impl;
 
 import com.badlogic.gdx.graphics.Color;
+import com.leonid.game.calc.GameCalculator;
 import com.leonid.game.domain.common.HasPhysics;
 import com.leonid.game.domain.kiosk.Kiosk;
 import com.leonid.game.domain.kiosk.KioskContext;
 import com.leonid.game.view.rander.EntityRenderer;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import static com.badlogic.gdx.graphics.Color.*;
@@ -16,6 +18,8 @@ import static com.leonid.game.domain.kiosk.KioskStatus.DEAD;
 @Component
 public class KioskRenderer extends EntityRenderer<Kiosk> {
 
+    @Autowired
+    private GameCalculator calculator;
 
     @Override
     public void render(Kiosk kiosk) {
@@ -54,7 +58,7 @@ public class KioskRenderer extends EntityRenderer<Kiosk> {
 
     private void drawCustomerInQueueCount(KioskContext kioskContext, Float x, Float y, int size) {
         font.setColor(Color.valueOf("FFD700"));
-        font.draw(batch, String.valueOf(kioskContext.getCustomersCount()), x - size, y - size);
+        font.draw(batch, kioskContext.getCustomersCount() + "/" + calculator.getKioskMaxQueue(kioskContext.getMaster()), x - size, y - size);
     }
 
     private void drawKiosk(Kiosk kiosk) {

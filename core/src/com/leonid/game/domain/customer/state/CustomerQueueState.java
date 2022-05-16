@@ -1,6 +1,7 @@
 package com.leonid.game.domain.customer.state;
 
 import com.leonid.game.calc.GameCalculator;
+import com.leonid.game.config.Config;
 import com.leonid.game.domain.common.State;
 import com.leonid.game.domain.customer.Customer;
 import com.leonid.game.domain.customer.CustomerContext;
@@ -8,7 +9,6 @@ import com.leonid.game.domain.kiosk.Kiosk;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.ApplicationContext;
-import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
@@ -27,10 +27,9 @@ public class CustomerQueueState implements State<CustomerContext> {
     @Autowired
     private ApplicationContext app;
     @Autowired
-    private GameCalculator gameCalculator;
-
+    private Config config;
     @Autowired
-    private ApplicationEventPublisher eventPublisher;
+    private GameCalculator gameCalculator;
 
     private final Random random = new Random();
 
@@ -43,7 +42,7 @@ public class CustomerQueueState implements State<CustomerContext> {
 
     @Override
     public void tic(CustomerContext customerContext) {
-        if (isWaitingFor(10) && random.nextBoolean()) {
+        if (isWaitingFor(config.getCustomerWaitingTime()) && random.nextInt(100) < config.getCustomerToGoToAnotherKioskPercent()) {
             goToAnotherKiosk(customerContext);
         }
     }
