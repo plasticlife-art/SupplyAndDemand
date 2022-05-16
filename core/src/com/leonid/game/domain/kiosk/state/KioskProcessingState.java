@@ -71,11 +71,15 @@ public class KioskProcessingState implements State<KioskContext> {
     }
 
     private boolean isOverloaded(KioskContext context) {
-        return context.getCustomersCount() >= 50 * (1 + 0.5 * (context.getMaster().getLevel() - 1));
+        return context.getCustomersCount() >= getMaxQueue();
+    }
+
+    public int getMaxQueue() {
+        return config.getKioskDefaultMaxQueue() * (1 + config.getKioskMaxQueueToLevelMultiplier() * (context.getMaster().getLevel() - 1));
     }
 
     private long getProcessingTime(KioskContext context) {
-        return (long) (NANOS_PER_SECOND * config.getProcessingSeconds() / (context.getMaster().getLevel() * 1.5));
+        return Math.round(NANOS_PER_SECOND * config.getKioskProcessingTimeDefaultSeconds() / (context.getMaster().getLevel() * config.getKioskProcessingTimeToLevelMultiplier()));
     }
 
     private boolean inProcessingFor(long nanos) {

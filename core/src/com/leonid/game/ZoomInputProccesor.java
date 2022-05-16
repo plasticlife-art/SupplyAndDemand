@@ -25,7 +25,7 @@ public class ZoomInputProccesor extends InputMultiplexer {
 
     @Override
     public boolean scrolled(float amountX, float amountY) {
-        camera.zoom += amountY * 10;
+        camera.zoom += amountY * 0.1;
         adjustZoom();
         return true;
     }

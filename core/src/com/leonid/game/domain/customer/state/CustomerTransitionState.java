@@ -43,18 +43,26 @@ public abstract class CustomerTransitionState implements State<CustomerContext> 
 
     protected boolean hasSamePosition(Customer customer, HasPhysics entity) {
 
-        return Math.abs(entity.getPosition().getX() - customer.getPosition().getX()) < 1
-                && Math.abs(entity.getPosition().getY() - customer.getPosition().getY()) < 1;
+        return Math.abs(getGoalX(entity) - customer.getPosition().getX()) < 1
+                && Math.abs(getGoalY(entity) - customer.getPosition().getY()) < 1;
     }
 
-    private static Vector2 getDirection(Customer customer, HasPhysics entity) {
+    private Vector2 getDirection(Customer customer, HasPhysics entity) {
         return getDirection(customer.getPosition().getX(),
                 customer.getPosition().getY(),
-                entity.getPosition().getX(),
-                entity.getPosition().getY());
+                getGoalX(entity),
+                getGoalY(entity));
     }
 
-    private static Vector2 getDirection(Float x, Float y, Float x1, Float y1) {
+    protected Float getGoalY(HasPhysics entity) {
+        return entity.getPosition().getY();
+    }
+
+    protected Float getGoalX(HasPhysics entity) {
+        return entity.getPosition().getX();
+    }
+
+    private Vector2 getDirection(Float x, Float y, Float x1, Float y1) {
         Vector2 recalcVector = new Vector2(x, y);
         Vector2 planetVector = new Vector2(x1, y1);
         recalcVector.sub(planetVector).nor();

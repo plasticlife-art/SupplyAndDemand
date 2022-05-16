@@ -28,9 +28,13 @@ public class CustomerGenerator {
 
 
     public Customer generate(Home home) {
-        Customer customer = new Customer(generateName(), Position.of(home));
+        Customer customer = new Customer(generateName(), getNewCustomerPosition(home));
         customer.setHome(home);
         return customer;
+    }
+
+    private Position getNewCustomerPosition(Home home) {
+        return new Position(home.getPosition().getX() + home.getSize() / 2, home.getPosition().getY() + home.getSize() / 2);
     }
 
     private String generateName() {

@@ -37,4 +37,15 @@ public class CustomerTransitionHomeState extends CustomerTransitionState {
 
         move(customer, goal);
     }
+
+    @Override
+    protected Float getGoalX(HasPhysics entity) {
+        return super.getGoalX(entity) + entity.getSize() / 2;
+    }
+
+
+    @Override
+    protected Float getGoalY(HasPhysics entity) {
+        return super.getGoalY(entity) + entity.getSize() / 2;
+    }
 }

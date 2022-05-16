@@ -21,6 +21,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
+import org.springframework.util.StopWatch;
 
 import javax.annotation.PostConstruct;
 import java.time.LocalTime;
@@ -49,13 +50,14 @@ public class GameContext {
     private final GameCalculator gameCalculator;
     private final Random random = new Random();
     private int kiosksGenerationCount;
-    private int customersGenerationCount;
 
     @Autowired
     private ApplicationContext app;
     @Autowired
     private Config config;
     private LocalTime autoReInitAt;
+    private StopWatch stopWatch;
+    private LocalTime printAt = LocalTime.now().plusMinutes(1);
 
 
     public GameContext(EntitiesHolder holder,
@@ -68,6 +70,8 @@ public class GameContext {
         this.customerGenerator = customerGenerator;
         this.homeGenerator = homeGenerator;
         this.gameCalculator = gameCalculator;
+
+        stopWatch = new StopWatch("tic");
     }
 
     @PostConstruct
@@ -109,35 +113,8 @@ public class GameContext {
         holder.addEntity(kioskContext);
     }
 
-    private void generateCustomers() {
-        customersGenerationCount = getCustomerGenerationCount();
-        generateCustomers(getCustomerGenerationCount());
-    }
-
-    private int getCustomerGenerationCount() {
-        if (config.getCustomerGenerationCount() == -1) {
-            return Math.max(kiosksGenerationCount, randomCustomerCount());
-        } else {
-            return config.getCustomerGenerationCount();
-        }
-    }
-
-    private int randomCustomerCount() {
-        return random.nextInt(Math.round(randomCustomerBorder()));
-    }
-
-    private float randomCustomerBorder() {
-        return config.getCustomerGenerationBorder() + config.getCustomerGenerationKioskLevelCoef() * getMaxKioskLevel();
-    }
-
     public int getMaxKioskLevel() {
         return (int) holder.getMaxKioskLevel();
-    }
-
-    private void generateCustomers(int customersCount) {
-        for (int i = 0; i < customersCount; i++) {
-            generateCustomer(WIDTH, HEIGHT);
-        }
     }
 
     private void generateCustomer(float w, float h) {
@@ -157,19 +134,43 @@ public class GameContext {
     }
 
     public void tic() {
+        stopWatch.start();
+
         holder.ticContexts();
 
         recalcCustomerCount();
 
         checkAutoReInit();
-
-//        generateCustomersRandomly();
+        stopWatch.stop();
+        printPerformanceStatisticIfNeeded();
     }
 
-    private void generateCustomersRandomly() {
-        if (random.nextInt(config.getProbabilityBound()) < 1 && kiosksGenerationCount > 0) {
-            generateCustomers(getCustomerGenerationCount());
+    private void printPerformanceStatisticIfNeeded() {
+        if (LocalTime.now().isAfter(printAt)) {
+            printAt = LocalTime.now().plusMinutes(1);
+            log.info("Tic time avg: {} ns", formatNanos(Math.round(1.0f * stopWatch.getTotalTimeNanos() / stopWatch.getTaskCount())));
+            log.info("Last tic: {} ns. Total objects: {}. Customers: {}, Homes: {}, Kiosks: {}.",
+                    formatNanos(stopWatch.getLastTaskTimeNanos()),
+                    holder.getCustomersCount() + holder.getHomeCount() + holder.getKiosksCount(),
+                    holder.getCustomersCount(),
+                    holder.getHomeCount(),
+                    holder.getKiosksCount());
         }
+    }
+
+    private String formatNanos(long nanos) {
+        String s = String.valueOf(nanos);
+
+        StringBuilder stringBuilder = new StringBuilder();
+
+        for (int i = s.length() - 1; i >= 0; i--) {
+            if ((s.length() - 1 - i) % 3 == 0 && i != s.length() - 1) {
+                stringBuilder.append(" ");
+            }
+            stringBuilder.append(s.charAt(i));
+        }
+
+        return stringBuilder.reverse().toString();
     }
 
     private void recalcCustomerCount() {
@@ -217,9 +218,6 @@ public class GameContext {
 
     @EventListener
     public void onApplicationEvent(KioskDeadEvent event) {
-
-        log.info("Kiosk dead [{}/{}]", deadKioskCount(), kiosksGenerationCount);
-
         if (isEveryKioskDead() && autoReInitAt == null) {
             autoReInitAt = LocalTime.now().plusMinutes(1);
             log.info("Everybody dead. Restart in 1 minute.");
@@ -227,7 +225,7 @@ public class GameContext {
     }
 
     private boolean isEveryKioskDead() {
-        return deadKioskCount() == kiosksGenerationCount;
+        return deadKioskCount() == holder.getEntities(Kiosk.class).size();
     }
 
     public int deadKioskCount() {

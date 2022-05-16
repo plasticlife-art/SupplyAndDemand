@@ -54,7 +54,7 @@ public class EntitiesHolder {
         homeContexts.put(homeContext.getMaster(), homeContext);
     }
 
-    public <T extends HasPhysics> List<T> getEntity(Class<T> tClass) {
+    public <T extends HasPhysics> List<T> getEntities(Class<T> tClass) {
         ArrayList<T> result = new ArrayList<>();
         for (HasPhysics entity : entities.values()) {
             if (tClass.isAssignableFrom(entity.getClass())) {
@@ -115,5 +115,14 @@ public class EntitiesHolder {
 
     public int getCustomersCount() {
         return customerContexts.size();
+    }
+
+    public int getKiosksCount() {
+        return kioskContexts.size();
+    }
+
+
+    public int getHomeCount() {
+        return homeContexts.size();
     }
 }

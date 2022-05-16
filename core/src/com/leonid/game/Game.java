@@ -16,20 +16,19 @@ import org.springframework.stereotype.Component;
 
 import static com.badlogic.gdx.Input.Keys.R;
 import static com.badlogic.gdx.graphics.Color.BLACK;
-import static com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType.Filled;
 import static com.badlogic.gdx.utils.ScreenUtils.clear;
 
 @Component
 public class Game extends ApplicationAdapter {
 
-	public static final int WIDTH = 1080;
+	public static final int WIDTH = 1080 * 10;
 	public static final int HEIGHT = WIDTH / 4 * 3;
 
 
 	@Autowired
 	private GameContext context;
 	@Autowired
-	private EntitiesHolder entitiesHolder;
+	private EntitiesHolder holder;
 	@Autowired
 	private RenderController renderController;
 	private OrthographicCamera camera;
@@ -101,11 +100,7 @@ public class Game extends ApplicationAdapter {
 	}
 
 	private void drawEntities() {
-		shapeRenderer.begin(Filled);
-		entitiesHolder.getEntities().forEachRemaining(entity -> {
-			renderController.render(entity);
-		});
-		shapeRenderer.end();
+		renderController.render();
 	}
 
 	private void processInput() {

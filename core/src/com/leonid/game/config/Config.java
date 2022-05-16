@@ -16,14 +16,12 @@ import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
 public class Config {
 
     private int kiosksGenerationCount;
-    private int customerGenerationCount;
-    private int probabilityBound;
-    private int processingSeconds;
-    private int levelThreshold;
-    private float customerGenerationKioskLevelCoef;
-    private float customerGenerationBorder;
+    private int kioskProcessingTimeDefaultSeconds;
+    private float kioskProcessingTimeToLevelMultiplier;
+    private int kioskMaxQueueToLevelMultiplier;
+    private int kioskDefaultMaxQueue;
 
-    private float generationHomeCount;
+    private int generationHomeCount;
     private float generationCustomerPerHomePerTime;
     private Long generationCustomerTime;
 
@@ -31,7 +29,7 @@ public class Config {
     public ThreadPoolTaskScheduler threadPoolTaskScheduler() {
         ThreadPoolTaskScheduler threadPoolTaskScheduler
                 = new ThreadPoolTaskScheduler();
-        threadPoolTaskScheduler.setPoolSize(10);
+        threadPoolTaskScheduler.setPoolSize(getGenerationHomeCount());
         threadPoolTaskScheduler.setThreadNamePrefix(
                 "ThreadPoolTaskScheduler");
         return threadPoolTaskScheduler;
@@ -45,59 +43,19 @@ public class Config {
         this.kiosksGenerationCount = kiosksGenerationCount;
     }
 
-    public int getProbabilityBound() {
-        return probabilityBound;
+    public int getKioskProcessingTimeDefaultSeconds() {
+        return kioskProcessingTimeDefaultSeconds;
     }
 
-    public void setProbabilityBound(int probabilityBound) {
-        this.probabilityBound = probabilityBound;
+    public void setKioskProcessingTimeDefaultSeconds(int kioskProcessingTimeDefaultSeconds) {
+        this.kioskProcessingTimeDefaultSeconds = kioskProcessingTimeDefaultSeconds;
     }
 
-    public int getProcessingSeconds() {
-        return processingSeconds;
-    }
-
-    public void setProcessingSeconds(int processingSeconds) {
-        this.processingSeconds = processingSeconds;
-    }
-
-    public int getLevelThreshold() {
-        return levelThreshold;
-    }
-
-    public void setLevelThreshold(int levelThreshold) {
-        this.levelThreshold = levelThreshold;
-    }
-
-    public int getCustomerGenerationCount() {
-        return customerGenerationCount;
-    }
-
-    public void setCustomerGenerationCount(int customerGenerationCount) {
-        this.customerGenerationCount = customerGenerationCount;
-    }
-
-    public float getCustomerGenerationKioskLevelCoef() {
-        return customerGenerationKioskLevelCoef;
-    }
-
-    public void setCustomerGenerationKioskLevelCoef(float customerGenerationKioskLevelCoef) {
-        this.customerGenerationKioskLevelCoef = customerGenerationKioskLevelCoef;
-    }
-
-    public float getCustomerGenerationBorder() {
-        return customerGenerationBorder;
-    }
-
-    public void setCustomerGenerationBorder(float customerGenerationBorder) {
-        this.customerGenerationBorder = customerGenerationBorder;
-    }
-
-    public float getGenerationHomeCount() {
+    public int getGenerationHomeCount() {
         return generationHomeCount;
     }
 
-    public void setGenerationHomeCount(float generationHomeCount) {
+    public void setGenerationHomeCount(int generationHomeCount) {
         this.generationHomeCount = generationHomeCount;
     }
 
@@ -115,5 +73,29 @@ public class Config {
 
     public void setGenerationCustomerTime(Long generationCustomerTime) {
         this.generationCustomerTime = generationCustomerTime;
+    }
+
+    public int getKioskMaxQueueToLevelMultiplier() {
+        return kioskMaxQueueToLevelMultiplier;
+    }
+
+    public void setKioskMaxQueueToLevelMultiplier(int kioskMaxQueueToLevelMultiplier) {
+        this.kioskMaxQueueToLevelMultiplier = kioskMaxQueueToLevelMultiplier;
+    }
+
+    public int getKioskDefaultMaxQueue() {
+        return kioskDefaultMaxQueue;
+    }
+
+    public void setKioskDefaultMaxQueue(int kioskDefaultMaxQueue) {
+        this.kioskDefaultMaxQueue = kioskDefaultMaxQueue;
+    }
+
+    public float getKioskProcessingTimeToLevelMultiplier() {
+        return kioskProcessingTimeToLevelMultiplier;
+    }
+
+    public void setKioskProcessingTimeToLevelMultiplier(float kioskProcessingTimeToLevelMultiplier) {
+        this.kioskProcessingTimeToLevelMultiplier = kioskProcessingTimeToLevelMultiplier;
     }
 }

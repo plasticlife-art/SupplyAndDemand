@@ -7,8 +7,8 @@ import com.leonid.game.domain.kiosk.KioskContext;
 import com.leonid.game.view.rander.EntityRenderer;
 import org.springframework.stereotype.Component;
 
-import static com.badlogic.gdx.graphics.Color.BLACK;
-import static com.badlogic.gdx.graphics.Color.GREEN;
+import static com.badlogic.gdx.graphics.Color.*;
+import static com.leonid.game.domain.kiosk.KioskStatus.DEAD;
 
 /**
  * @author Leonid Cheremshantsev
@@ -58,10 +58,40 @@ public class KioskRenderer extends EntityRenderer<Kiosk> {
     }
 
     private void drawKiosk(Kiosk kiosk) {
+        drawBuilding(kiosk);
+        drawStatus(kiosk);
+    }
+
+    private void drawStatus(Kiosk kiosk) {
         Float x = kiosk.getPosition().getX();
         Float y = kiosk.getPosition().getY();
 
-        renderer.setColor(kiosk.getColor());
+        Color color = YELLOW;
+
+        switch (kiosk.getStatus()) {
+            case WAITING:
+                color = YELLOW;
+                break;
+            case PROCESSING:
+                color = GREEN;
+                break;
+        }
+
+        renderer.setColor(color);
+        renderer.circle(x - kiosk.getSize() / 2f, y + kiosk.getSize() / 2f, kiosk.getSize() / 7f);
+    }
+
+    private void drawBuilding(Kiosk kiosk) {
+        Float x = kiosk.getPosition().getX();
+        Float y = kiosk.getPosition().getY();
+
+        Color color = DARK_GRAY;
+
+        if (kiosk.getStatus() == DEAD) {
+            color = RED;
+        }
+
+        renderer.setColor(color);
         renderer.circle(x, y, kiosk.getSize());
     }
 }
