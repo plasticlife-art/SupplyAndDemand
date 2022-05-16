@@ -28,7 +28,7 @@ public abstract class CustomerTransitionState implements State<CustomerContext> 
     public CustomerTransitionState(CustomerContext customerContext, HasPhysics goal) {
         this.customerContext = customerContext;
         this.customerContext.setCustomerState(this);
-        customerContext.getMaster().setCustomerStatus(TRANSITION);
+        customerContext.getMaster().setStatus(TRANSITION);
 
         this.goal = goal;
     }

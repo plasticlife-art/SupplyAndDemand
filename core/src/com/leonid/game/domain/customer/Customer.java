@@ -59,7 +59,7 @@ public class Customer implements HasPhysics {
         return customerStatus;
     }
 
-    public void setCustomerStatus(CustomerStatus customerStatus) {
+    public void setStatus(CustomerStatus customerStatus) {
         this.customerStatus = customerStatus;
     }
 

@@ -37,7 +37,8 @@ public class CustomerQueueState implements State<CustomerContext> {
 
     public CustomerQueueState(CustomerContext customerContext) {
         this.inQueue = LocalTime.now();
-        customerContext.getMaster().setCustomerStatus(QUEUE);
+        customerContext.getMaster().setStatus(QUEUE);
+        customerContext.setCustomerState(this);
     }
 
     @Override

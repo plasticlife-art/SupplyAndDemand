@@ -14,7 +14,6 @@ import org.springframework.stereotype.Component;
 import javax.annotation.PostConstruct;
 import java.time.LocalTime;
 
-import static com.badlogic.gdx.graphics.Color.YELLOW;
 import static com.leonid.game.domain.kiosk.KioskStatus.WAITING;
 import static org.springframework.beans.factory.config.ConfigurableBeanFactory.SCOPE_PROTOTYPE;
 
@@ -36,7 +35,6 @@ public class KioskWaitingState implements State<KioskContext> {
 
     public KioskWaitingState(KioskContext context) {
         context.setState(this);
-        context.getMaster().setColor(YELLOW);
         context.getMaster().setStatus(WAITING);
     }
 

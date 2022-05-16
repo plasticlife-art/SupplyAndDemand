@@ -6,6 +6,7 @@ import com.leonid.game.config.Config;
 import com.leonid.game.domain.common.HasPhysics;
 import com.leonid.game.domain.customer.Customer;
 import com.leonid.game.domain.customer.CustomerContext;
+import com.leonid.game.domain.customer.state.CustomerProcessingState;
 import com.leonid.game.domain.kiosk.Kiosk;
 import com.leonid.game.domain.kiosk.KioskContext;
 import com.leonid.game.domain.kiosk.state.KioskProcessingState;
@@ -139,7 +140,7 @@ public class GameContext {
 
         holder.ticContexts();
 
-        recalcCustomerCount();
+        recalcKioskCustomerCount();
 
         checkAutoReInit();
         stopWatch.stop();
@@ -174,24 +175,27 @@ public class GameContext {
         return stringBuilder.reverse().toString();
     }
 
-    private void recalcCustomerCount() {
-        holder.getEntities().forEachRemaining(entity -> {
-            if (entity instanceof Customer) {
-                Customer customer = (Customer) entity;
-                KioskContext kioskContext = getContext(customer.getKiosk());
-                if (kioskContext == null || kioskContext.getMaster() == null) {
-                    return;
-                }
-                CustomerContext customerContext = getContext(customer);
-
-                if (customer.getCustomerStatus() == QUEUE && !kioskContext.isInQueue(customerContext)) {
-                    kioskContext.putCustomer(customerContext);
-                }
-
-                if (kioskContext.getMaster().getStatus() == WAITING && kioskContext.getProcessingCustomer() != null) {
-                    kioskContext.setState(app.getBean(KioskProcessingState.class, kioskContext));
-                }
+    private void recalcKioskCustomerCount() {
+        holder.getEntities(Customer.class).forEach(customer -> {
+            KioskContext kioskContext = getContext(customer.getKiosk());
+            if (kioskContext == null || kioskContext.getMaster() == null) {
+                return;
             }
+            CustomerContext customerContext = getContext(customer);
+            if (customerContext == null || customerContext.getMaster() == null) {
+                return;
+            }
+
+            if (customer.getCustomerStatus() == QUEUE && !kioskContext.isInQueue(customerContext)) {
+                kioskContext.putCustomer(customerContext);
+            }
+
+            CustomerContext processingCustomer = kioskContext.getProcessingCustomer();
+            if (kioskContext.getMaster().getStatus() == WAITING && processingCustomer != null) {
+                app.getBean(KioskProcessingState.class, kioskContext);
+                app.getBean(CustomerProcessingState.class, processingCustomer);
+            }
+
         });
     }
 

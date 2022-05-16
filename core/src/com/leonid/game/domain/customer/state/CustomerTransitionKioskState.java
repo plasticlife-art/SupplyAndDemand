@@ -26,7 +26,7 @@ public class CustomerTransitionKioskState extends CustomerTransitionState {
         Customer customer = customerContext.getMaster();
 
         if (hasSamePosition(customer, goal)) {
-            customerContext.setCustomerState(app.getBean(CustomerQueueState.class, customerContext));
+            app.getBean(CustomerQueueState.class, customerContext);
             return;
         }
 

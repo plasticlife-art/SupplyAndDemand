@@ -1,6 +1,5 @@
 package com.leonid.game.domain.kiosk.state;
 
-import com.badlogic.gdx.graphics.Color;
 import com.leonid.game.calc.GameCalculator;
 import com.leonid.game.config.Config;
 import com.leonid.game.domain.common.State;
@@ -27,6 +26,7 @@ import static com.leonid.game.domain.kiosk.KioskStatus.PROCESSING;
 @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
 public class KioskProcessingState implements State<KioskContext> {
 
+    private final CustomerContext processingCustomer;
     @Autowired
     private ApplicationContext app;
     @Autowired
@@ -42,17 +42,16 @@ public class KioskProcessingState implements State<KioskContext> {
         this.startTime = LocalTime.now();
         context.setState(this);
         context.getMaster().setStatus(PROCESSING);
-        context.getMaster().setColor(Color.DARK_GRAY);
+
+        this.processingCustomer = context.getProcessingCustomer();
     }
 
     @Override
     public void tic(KioskContext context) {
         if (inProcessingFor(calculator.getKioskProcessingTime(context.getMaster()))) {
-            CustomerContext customerContext = context.processCustomer();
+            context.processCustomer();
 
-            if (customerContext == null) return; //todo
-
-            customerContext.setCustomerState(app.getBean(CustomerTransitionHomeState.class, customerContext, customerContext.getMaster().getHome()));
+            app.getBean(CustomerTransitionHomeState.class, processingCustomer, processingCustomer.getMaster().getHome());
 
             CustomerContext nextCustomer = context.getProcessingCustomer();
             if (nextCustomer != null) {

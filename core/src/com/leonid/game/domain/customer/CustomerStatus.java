@@ -5,5 +5,7 @@ package com.leonid.game.domain.customer;
  */
 public enum CustomerStatus {
     TRANSITION,
-    QUEUE
+    QUEUE,
+
+    PROCESSING
 }
