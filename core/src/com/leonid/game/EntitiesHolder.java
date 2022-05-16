@@ -3,11 +3,18 @@ package com.leonid.game;
 import com.leonid.game.domain.common.HasPhysics;
 import com.leonid.game.domain.customer.Customer;
 import com.leonid.game.domain.customer.CustomerContext;
+import com.leonid.game.domain.customer.state.CustomerTransitionKioskState;
+import com.leonid.game.domain.home.Home;
+import com.leonid.game.domain.home.HomeContext;
+import com.leonid.game.domain.home.state.HomeCustomerGenerationState;
 import com.leonid.game.domain.kiosk.Kiosk;
 import com.leonid.game.domain.kiosk.KioskContext;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
 
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * @author Leonid Cheremshantsev
@@ -15,21 +22,50 @@ import java.util.*;
 @Component
 public class EntitiesHolder {
 
-    private final Set<HasPhysics> entities = new LinkedHashSet<>();
 
-    private final Map<Customer, CustomerContext> customerContexts = new HashMap<>();
-    private final Map<Kiosk, KioskContext> kioskContexts = new HashMap<>();
+    @Autowired
+    private ApplicationContext app;
+
+    private final Map<HasPhysics, HasPhysics> entities = new ConcurrentHashMap<>();
+
+    private final Map<Customer, CustomerContext> customerContexts = new ConcurrentHashMap<>();
+    private final Map<Kiosk, KioskContext> kioskContexts = new ConcurrentHashMap<>();
+    private final Map<Home, HomeContext> homeContexts = new ConcurrentHashMap<>();
 
     public void addEntity(Collection<HasPhysics> kiosks) {
-        this.entities.addAll(kiosks);
+        kiosks.forEach(e -> this.entities.put(e, e));
     }
 
-    public void addEntity(HasPhysics kiosk) {
-        entities.add(kiosk);
+    public void addEntity(HasPhysics entity) {
+        entities.put(entity, entity);
+        if (entity instanceof Customer) {
+            CustomerContext customerContext = new CustomerContext((Customer) entity);
+            app.getBean(CustomerTransitionKioskState.class, customerContext, customerContext.getMaster().getKiosk());
+            addEntity(customerContext);
+        } else if (entity instanceof Home) {
+            HomeContext homeContext = new HomeContext((Home) entity);
+            app.getBean(HomeCustomerGenerationState.class, homeContext);
+            addEntity(homeContext);
+        }
+
+    }
+
+    private void addEntity(HomeContext homeContext) {
+        homeContexts.put(homeContext.getMaster(), homeContext);
+    }
+
+    public <T extends HasPhysics> List<T> getEntity(Class<T> tClass) {
+        ArrayList<T> result = new ArrayList<>();
+        for (HasPhysics entity : entities.values()) {
+            if (tClass.isAssignableFrom(entity.getClass())) {
+                result.add((T) entity);
+            }
+        }
+        return result;
     }
 
     public Iterator<HasPhysics> getEntities() {
-        return entities.iterator();
+        return entities.values().iterator();
     }
 
     public void remove(HasPhysics entity) {
@@ -55,6 +91,7 @@ public class EntitiesHolder {
     public void ticContexts() {
         customerContexts.values().forEach(CustomerContext::tic);
         kioskContexts.values().forEach(KioskContext::tic);
+        homeContexts.values().forEach(HomeContext::tic);
     }
 
     public void addEntity(CustomerContext customerContext) {

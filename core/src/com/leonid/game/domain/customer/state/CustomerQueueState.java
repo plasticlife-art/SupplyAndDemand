@@ -70,7 +70,7 @@ public class CustomerQueueState implements State<CustomerContext> {
         return kiosk;
     }
 
-    private CustomerTransitionState getTransitionState(CustomerContext customerContext) {
-        return app.getBean(CustomerTransitionState.class, customerContext);
+    private CustomerTransitionKioskState getTransitionState(CustomerContext customerContext) {
+        return app.getBean(CustomerTransitionKioskState.class, customerContext, customerContext.getMaster().getKiosk());
     }
 }

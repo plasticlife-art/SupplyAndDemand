@@ -4,9 +4,9 @@ import com.badlogic.gdx.graphics.Color;
 import com.leonid.game.config.Config;
 import com.leonid.game.domain.common.State;
 import com.leonid.game.domain.customer.CustomerContext;
+import com.leonid.game.domain.customer.state.CustomerTransitionHomeState;
 import com.leonid.game.domain.kiosk.KioskContext;
 import com.leonid.game.domain.kiosk.KioskDeadState;
-import com.leonid.game.event.CustomerProcessedEvent;
 import com.leonid.game.event.KioskDeadEvent;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
@@ -54,7 +54,7 @@ public class KioskProcessingState implements State<KioskContext> {
 
             if (customerContext == null) return; //todo
 
-            eventPublisher.publishEvent(new CustomerProcessedEvent(this, customerContext.getMaster()));
+            customerContext.setCustomerState(app.getBean(CustomerTransitionHomeState.class, customerContext, customerContext.getMaster().getHome()));
 
             CustomerContext nextCustomer = context.getProcessingCustomer();
             if (nextCustomer != null) {

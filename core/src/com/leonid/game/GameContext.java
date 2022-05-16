@@ -6,14 +6,14 @@ import com.leonid.game.config.Config;
 import com.leonid.game.domain.common.HasPhysics;
 import com.leonid.game.domain.customer.Customer;
 import com.leonid.game.domain.customer.CustomerContext;
-import com.leonid.game.domain.customer.state.CustomerTransitionState;
 import com.leonid.game.domain.kiosk.Kiosk;
 import com.leonid.game.domain.kiosk.KioskContext;
 import com.leonid.game.domain.kiosk.state.KioskProcessingState;
 import com.leonid.game.domain.kiosk.state.KioskWaitingState;
-import com.leonid.game.event.CustomerProcessedEvent;
+import com.leonid.game.event.CustomerComeHome;
 import com.leonid.game.event.KioskDeadEvent;
 import com.leonid.game.generator.CustomerGenerator;
+import com.leonid.game.generator.HomeGenerator;
 import com.leonid.game.generator.KioskGenerator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -45,6 +45,7 @@ public class GameContext {
     private final EntitiesHolder holder;
     private final KioskGenerator kioskGenerator;
     private final CustomerGenerator customerGenerator;
+    private final HomeGenerator homeGenerator;
     private final GameCalculator gameCalculator;
     private final Random random = new Random();
     private int kiosksGenerationCount;
@@ -60,17 +61,26 @@ public class GameContext {
     public GameContext(EntitiesHolder holder,
                        KioskGenerator kioskGenerator,
                        CustomerGenerator customerGenerator,
+                       HomeGenerator homeGenerator,
                        GameCalculator gameCalculator) {
         this.holder = holder;
         this.kioskGenerator = kioskGenerator;
         this.customerGenerator = customerGenerator;
+        this.homeGenerator = homeGenerator;
         this.gameCalculator = gameCalculator;
     }
 
     @PostConstruct
     public void init() {
         generateKiosks();
-        generateCustomers();
+
+        generateHomes();
+    }
+
+    private void generateHomes() {
+        for (int i = 0; i < config.getGenerationHomeCount(); i++) {
+            holder.addEntity(homeGenerator.generate(WIDTH, HEIGHT));
+        }
     }
 
     private void generateKiosks() {
@@ -126,20 +136,14 @@ public class GameContext {
 
     private void generateCustomers(int customersCount) {
         for (int i = 0; i < customersCount; i++) {
-            generateCustomer();
+            generateCustomer(WIDTH, HEIGHT);
         }
     }
 
-    private void generateCustomer() {
-        Customer customer = customerGenerator.generate(WIDTH, HEIGHT);
+    private void generateCustomer(float w, float h) {
+        Customer customer = customerGenerator.generate(w, h);
         customer.setKiosk(gameCalculator.getBestKiosk(customer));
         holder.addEntity(customer);
-
-        CustomerContext customerContext = new CustomerContext(customer);
-
-        customerContext.setCustomerState(app.getBean(CustomerTransitionState.class, customerContext));
-
-        holder.addEntity(customerContext);
     }
 
     public void reinit() {
@@ -159,7 +163,7 @@ public class GameContext {
 
         checkAutoReInit();
 
-        generateCustomersRandomly();
+//        generateCustomersRandomly();
     }
 
     private void generateCustomersRandomly() {
@@ -205,7 +209,7 @@ public class GameContext {
     }
 
     @EventListener
-    public void onApplicationEvent(CustomerProcessedEvent event) {
+    public void onApplicationEvent(CustomerComeHome event) {
         Customer customer = event.getCustomer();
 
         holder.remove(customer);

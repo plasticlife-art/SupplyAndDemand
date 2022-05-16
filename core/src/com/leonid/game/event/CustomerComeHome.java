@@ -6,11 +6,11 @@ import org.springframework.context.ApplicationEvent;
 /**
  * @author Leonid Cheremshantsev
  */
-public class CustomerProcessedEvent extends ApplicationEvent {
+public class CustomerComeHome extends ApplicationEvent {
 
     private final Customer customer;
 
-    public CustomerProcessedEvent(Object source, Customer customer) {
+    public CustomerComeHome(Object source, Customer customer) {
         super(source);
         this.customer = customer;
     }

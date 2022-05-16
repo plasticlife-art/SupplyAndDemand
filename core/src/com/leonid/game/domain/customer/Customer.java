@@ -3,6 +3,7 @@ package com.leonid.game.domain.customer;
 import com.badlogic.gdx.graphics.Color;
 import com.leonid.game.domain.common.HasPhysics;
 import com.leonid.game.domain.common.Position;
+import com.leonid.game.domain.home.Home;
 import com.leonid.game.domain.kiosk.Kiosk;
 
 /**
@@ -13,7 +14,7 @@ public class Customer implements HasPhysics {
     private String name;
     private Position position;
     private CustomerStatus customerStatus;
-
+    private Home home;
     private Kiosk kiosk;
 
     public Customer(String name, Position position) {
@@ -61,5 +62,13 @@ public class Customer implements HasPhysics {
 
     public void setKiosk(Kiosk kiosk) {
         this.kiosk = kiosk;
+    }
+
+    public Home getHome() {
+        return home;
+    }
+
+    public void setHome(Home home) {
+        this.home = home;
     }
 }

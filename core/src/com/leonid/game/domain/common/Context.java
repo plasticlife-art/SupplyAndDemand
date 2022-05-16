@@ -7,4 +7,6 @@ public interface Context<T extends HasPhysics> {
 
     T getMaster();
 
+    void tic();
+
 }

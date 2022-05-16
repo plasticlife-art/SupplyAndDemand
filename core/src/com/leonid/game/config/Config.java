@@ -21,6 +21,10 @@ public class Config {
     private float customerGenerationKioskLevelCoef;
     private float customerGenerationBorder;
 
+    private float generationHomeCount;
+    private float generationCustomerPerHomePerTime;
+    private Long generationCustomerTime;
+
     public int getKiosksGenerationCount() {
         return kiosksGenerationCount;
     }
@@ -75,5 +79,29 @@ public class Config {
 
     public void setCustomerGenerationBorder(float customerGenerationBorder) {
         this.customerGenerationBorder = customerGenerationBorder;
+    }
+
+    public float getGenerationHomeCount() {
+        return generationHomeCount;
+    }
+
+    public void setGenerationHomeCount(float generationHomeCount) {
+        this.generationHomeCount = generationHomeCount;
+    }
+
+    public float getGenerationCustomerPerHomePerTime() {
+        return generationCustomerPerHomePerTime;
+    }
+
+    public void setGenerationCustomerPerHomePerTime(float generationCustomerPerHomePerTime) {
+        this.generationCustomerPerHomePerTime = generationCustomerPerHomePerTime;
+    }
+
+    public Long getGenerationCustomerTime() {
+        return generationCustomerTime;
+    }
+
+    public void setGenerationCustomerTime(Long generationCustomerTime) {
+        this.generationCustomerTime = generationCustomerTime;
     }
 }
