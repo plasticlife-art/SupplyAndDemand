@@ -6,6 +6,9 @@ import com.leonid.game.domain.common.Position;
 import com.leonid.game.domain.home.Home;
 import com.leonid.game.domain.kiosk.Kiosk;
 
+import java.util.Deque;
+import java.util.LinkedList;
+
 /**
  * @author Leonid Cheremshantsev
  */
@@ -16,10 +19,13 @@ public class Customer implements HasPhysics {
     private CustomerStatus customerStatus;
     private Home home;
     private Kiosk kiosk;
+    private Deque<Kiosk> kiosksHistory;
 
     public Customer(String name, Position position) {
         this.name = name;
         this.position = position;
+
+        kiosksHistory = new LinkedList<>();
     }
 
     public String getName() {
@@ -57,11 +63,15 @@ public class Customer implements HasPhysics {
     }
 
     public Kiosk getKiosk() {
-        return kiosk;
+        return kiosksHistory.peekLast();
     }
 
     public void setKiosk(Kiosk kiosk) {
-        this.kiosk = kiosk;
+        kiosksHistory.add(kiosk);
+    }
+
+    public Deque<Kiosk> getKiosksHistory() {
+        return kiosksHistory;
     }
 
     public Home getHome() {

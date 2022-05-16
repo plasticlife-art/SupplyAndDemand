@@ -45,6 +45,12 @@ public class GameCalculator {
         return getBestKiosk(customer, kiosks);
     }
 
+    public Kiosk calcBestKioskExceptHistory(Customer customer) {
+        ArrayList<Kiosk> kiosks = new ArrayList<>(getKiosks());
+        kiosks.removeAll(customer.getKiosksHistory());
+        return getBestKiosk(customer, kiosks);
+    }
+
     public Kiosk getBestKiosk(Customer customer) {
         return getBestKiosk(customer, getKiosks());
     }

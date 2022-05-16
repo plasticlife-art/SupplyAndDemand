@@ -60,7 +60,7 @@ public class CustomerQueueState implements State<CustomerContext> {
     }
 
     private Kiosk calcNewBestKiosk(Customer customer) {
-        Kiosk kiosk = gameCalculator.calcBestKioskExcept(customer, customer.getKiosk());
+        Kiosk kiosk = gameCalculator.calcBestKioskExceptHistory(customer);
 
         if (kiosk.getId() == -1L && customer.getKiosk() != null) {
             return customer.getKiosk();
