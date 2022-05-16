@@ -84,7 +84,9 @@ public class GameCalculator {
 
         Float kioskX = kiosk.getPosition().getX();
         Float kioskY = kiosk.getPosition().getY();
-        return (float) sqrt((customerX - kioskX) * (customerX - kioskX) + (customerY - kioskY) * (customerY - kioskY));
+        float distanceToCenter = (float) sqrt((customerX - kioskX) * (customerX - kioskX) + (customerY - kioskY) * (customerY - kioskY));
+
+        return distanceToCenter - kiosk.getSize();
     }
 
     private ArrayList<Kiosk> getKiosks() {
