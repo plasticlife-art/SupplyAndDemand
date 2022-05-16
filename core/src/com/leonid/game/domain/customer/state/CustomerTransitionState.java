@@ -1,6 +1,7 @@
 package com.leonid.game.domain.customer.state;
 
 import com.badlogic.gdx.math.Vector2;
+import com.leonid.game.config.Config;
 import com.leonid.game.domain.common.HasPhysics;
 import com.leonid.game.domain.common.State;
 import com.leonid.game.domain.customer.Customer;
@@ -16,13 +17,17 @@ import static com.leonid.game.domain.customer.CustomerStatus.TRANSITION;
 
 public abstract class CustomerTransitionState implements State<CustomerContext> {
 
+    private final CustomerContext customerContext;
     @Autowired
     protected ApplicationContext app;
+    @Autowired
+    private Config config;
 
     protected HasPhysics goal;
 
     public CustomerTransitionState(CustomerContext customerContext, HasPhysics goal) {
-        customerContext.setCustomerState(this);
+        this.customerContext = customerContext;
+        this.customerContext.setCustomerState(this);
         customerContext.getMaster().setCustomerStatus(TRANSITION);
 
         this.goal = goal;
@@ -33,6 +38,7 @@ public abstract class CustomerTransitionState implements State<CustomerContext> 
 
     protected void move(Customer customer, HasPhysics entity) {
         Vector2 direction = getDirection(customer, entity);
+        direction.scl(getCustomerSpeedMultiplier());
 
         Vector2 position = new Vector2(customer.getPosition().getX(), customer.getPosition().getY());
         position.sub(direction);
@@ -43,8 +49,12 @@ public abstract class CustomerTransitionState implements State<CustomerContext> 
 
     protected boolean hasSamePosition(Customer customer, HasPhysics entity) {
 
-        return Math.abs(getGoalX(entity) - customer.getPosition().getX()) < 1
-                && Math.abs(getGoalY(entity) - customer.getPosition().getY()) < 1;
+        return Math.abs(getGoalX(entity) - customer.getPosition().getX()) < getCustomerSpeedMultiplier()
+                && Math.abs(getGoalY(entity) - customer.getPosition().getY()) < getCustomerSpeedMultiplier();
+    }
+
+    private float getCustomerSpeedMultiplier() {
+        return customerContext.getMaster().getSpeedMultiplier();
     }
 
     private Vector2 getDirection(Customer customer, HasPhysics entity) {

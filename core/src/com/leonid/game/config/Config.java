@@ -17,7 +17,7 @@ public class Config {
 
     private int kiosksGenerationCount;
     private int kioskMaxLevel;
-    private int kioskProcessingTimeDefaultSeconds;
+    private float kioskProcessingTimeDefaultSeconds;
     private float kioskProcessingTimeToLevelMultiplier;
     private float kioskMaxQueueToLevelMultiplier;
     private int kioskDefaultMaxQueue;
@@ -27,6 +27,8 @@ public class Config {
     private Long generationCustomerTime;
     private int customerToGoToAnotherKioskPercent;
     private int customerWaitingTime;
+    private long kioskWaitingTime;
+    private int customerSpeedMultiplier;
 
     @Bean
     public ThreadPoolTaskScheduler threadPoolTaskScheduler() {
@@ -46,11 +48,11 @@ public class Config {
         this.kiosksGenerationCount = kiosksGenerationCount;
     }
 
-    public int getKioskProcessingTimeDefaultSeconds() {
+    public float getKioskProcessingTimeDefaultSeconds() {
         return kioskProcessingTimeDefaultSeconds;
     }
 
-    public void setKioskProcessingTimeDefaultSeconds(int kioskProcessingTimeDefaultSeconds) {
+    public void setKioskProcessingTimeDefaultSeconds(float kioskProcessingTimeDefaultSeconds) {
         this.kioskProcessingTimeDefaultSeconds = kioskProcessingTimeDefaultSeconds;
     }
 
@@ -124,5 +126,21 @@ public class Config {
 
     public void setCustomerWaitingTime(int customerWaitingTime) {
         this.customerWaitingTime = customerWaitingTime;
+    }
+
+    public long getKioskWaitingTime() {
+        return kioskWaitingTime;
+    }
+
+    public void setKioskWaitingTime(long kioskWaitingTime) {
+        this.kioskWaitingTime = kioskWaitingTime;
+    }
+
+    public int getCustomerSpeedMultiplier() {
+        return customerSpeedMultiplier;
+    }
+
+    public void setCustomerSpeedMultiplier(int customerSpeedMultiplier) {
+        this.customerSpeedMultiplier = customerSpeedMultiplier;
     }
 }

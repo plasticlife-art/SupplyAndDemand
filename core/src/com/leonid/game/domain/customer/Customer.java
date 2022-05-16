@@ -20,6 +20,7 @@ public class Customer implements HasPhysics {
     private Home home;
     private Kiosk kiosk;
     private Deque<Kiosk> kiosksHistory;
+    private float speedMultiplier;
 
     public Customer(String name, Position position) {
         this.name = name;
@@ -80,5 +81,13 @@ public class Customer implements HasPhysics {
 
     public void setHome(Home home) {
         this.home = home;
+    }
+
+    public float getSpeedMultiplier() {
+        return speedMultiplier;
+    }
+
+    public void setSpeedMultiplier(float speedMultiplier) {
+        this.speedMultiplier = speedMultiplier;
     }
 }

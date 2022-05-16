@@ -1,5 +1,6 @@
 package com.leonid.game.generator;
 
+import com.leonid.game.config.Config;
 import com.leonid.game.domain.common.Position;
 import com.leonid.game.domain.customer.Customer;
 import com.leonid.game.domain.home.Home;
@@ -17,6 +18,8 @@ public class CustomerGenerator {
 
     @Autowired
     private PositionGenerator positionGenerator;
+    @Autowired
+    private Config config;
 
     private final Random random = new Random();
 
@@ -30,6 +33,7 @@ public class CustomerGenerator {
     public Customer generate(Home home) {
         Customer customer = new Customer(generateName(), getNewCustomerPosition(home));
         customer.setHome(home);
+        customer.setSpeedMultiplier(random.nextInt(config.getCustomerSpeedMultiplier()) + 1);
         return customer;
     }
 

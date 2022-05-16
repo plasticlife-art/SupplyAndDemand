@@ -77,6 +77,11 @@ public class Kiosk implements HasPhysics {
         this.size *= 1.2;
     }
 
+    public void levelDown() {
+        level--;
+        this.size /= 1.2;
+    }
+
     public int getLevel() {
         return level;
     }
