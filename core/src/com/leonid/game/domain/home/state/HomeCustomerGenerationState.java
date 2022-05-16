@@ -26,6 +26,7 @@ import static org.springframework.beans.factory.config.ConfigurableBeanFactory.S
 @Scope(SCOPE_PROTOTYPE)
 public class HomeCustomerGenerationState implements State<HomeContext> {
 
+    private final HomeContext homeContext;
     @Autowired
     private TaskExecutor taskExecutor;
 
@@ -43,6 +44,7 @@ public class HomeCustomerGenerationState implements State<HomeContext> {
     private boolean generation = false;
 
     public HomeCustomerGenerationState(HomeContext homeContext) {
+        this.homeContext = homeContext;
         homeContext.setState(this);
     }
 
@@ -64,18 +66,16 @@ public class HomeCustomerGenerationState implements State<HomeContext> {
     }
 
     private void generateCustomers() {
-        holder.getEntity(Home.class).forEach(home -> {
-            try {
-                for (int i = 0; i < config.getGenerationCustomerPerHomePerTime(); i++) {
-                    if (random.nextBoolean()) {
-                        generateCustomer(home);
-                        TimeUnit.MILLISECONDS.sleep(250);
-                    }
+        try {
+            for (int i = 0; i < config.getGenerationCustomerPerHomePerTime(); i++) {
+                if (random.nextBoolean()) {
+                    generateCustomer(homeContext.getMaster());
+                    TimeUnit.MILLISECONDS.sleep(250);
                 }
-            } catch (InterruptedException e) {
-//                return;
             }
-        });
+        } catch (InterruptedException e) {
+//                return;
+        }
     }
 
     private void generateCustomer(Home home) {
