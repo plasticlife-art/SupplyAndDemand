@@ -68,4 +68,15 @@ public class EntitiesHolder {
     public KioskContext getContext(Kiosk kiosk) {
         return kioskContexts.get(kiosk);
     }
+
+    public float getMaxKioskLevel() {
+        return kioskContexts.keySet().stream()
+                .mapToInt(Kiosk::getLevel)
+                .max()
+                .orElse(1);
+    }
+
+    public int getCustomersCount() {
+        return customerContexts.size();
+    }
 }

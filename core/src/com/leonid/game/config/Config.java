@@ -18,7 +18,8 @@ public class Config {
     private int probabilityBound;
     private int processingSeconds;
     private int levelThreshold;
-    private float customerGenerationKioskCoef;
+    private float customerGenerationKioskLevelCoef;
+    private float customerGenerationBorder;
 
     public int getKiosksGenerationCount() {
         return kiosksGenerationCount;
@@ -60,11 +61,19 @@ public class Config {
         this.customerGenerationCount = customerGenerationCount;
     }
 
-    public float getCustomerGenerationKioskCoef() {
-        return customerGenerationKioskCoef;
+    public float getCustomerGenerationKioskLevelCoef() {
+        return customerGenerationKioskLevelCoef;
     }
 
-    public void setCustomerGenerationKioskCoef(float customerGenerationKioskCoef) {
-        this.customerGenerationKioskCoef = customerGenerationKioskCoef;
+    public void setCustomerGenerationKioskLevelCoef(float customerGenerationKioskLevelCoef) {
+        this.customerGenerationKioskLevelCoef = customerGenerationKioskLevelCoef;
+    }
+
+    public float getCustomerGenerationBorder() {
+        return customerGenerationBorder;
+    }
+
+    public void setCustomerGenerationBorder(float customerGenerationBorder) {
+        this.customerGenerationBorder = customerGenerationBorder;
     }
 }

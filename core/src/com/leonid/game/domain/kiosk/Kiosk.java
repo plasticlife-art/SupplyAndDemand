@@ -73,6 +73,10 @@ public class Kiosk implements HasPhysics {
     }
 
     public void levelUp() {
+        if (level >= 10) {
+            return;
+        }
+
         level++;
         this.size *= 1.2;
     }

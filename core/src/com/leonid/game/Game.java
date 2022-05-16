@@ -9,21 +9,20 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.viewport.ExtendViewport;
-import com.leonid.game.domain.customer.Customer;
-import com.leonid.game.domain.kiosk.Kiosk;
 import com.leonid.game.view.RenderController;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Component;
 
 import static com.badlogic.gdx.Input.Keys.R;
+import static com.badlogic.gdx.graphics.Color.BLACK;
 import static com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType.Filled;
 import static com.badlogic.gdx.utils.ScreenUtils.clear;
 
 @Component
 public class Game extends ApplicationAdapter {
 
-	public static final int WIDTH = 1080 * 5;
+	public static final int WIDTH = 1080;
 	public static final int HEIGHT = WIDTH / 4 * 3;
 
 
@@ -34,7 +33,8 @@ public class Game extends ApplicationAdapter {
 	@Autowired
 	private RenderController renderController;
 	private OrthographicCamera camera;
-	private SpriteBatch batch;
+	private SpriteBatch entityBatch;
+	private SpriteBatch statisticBatch;
 	private BitmapFont font;
 	private ExtendViewport viewport;
 	private ShapeRenderer shapeRenderer;
@@ -43,14 +43,20 @@ public class Game extends ApplicationAdapter {
 	@Override
 	public void create() {
 		camera = new OrthographicCamera();
+
 		font = new BitmapFont();
-		batch = new SpriteBatch();
+
+		entityBatch = new SpriteBatch();
+
+		statisticBatch = new SpriteBatch();
+
 		viewport = new ExtendViewport(WIDTH, HEIGHT, camera);
+
 		shapeRenderer = new ShapeRenderer();
 		shapeRenderer.setAutoShapeType(true);
 
 		renderController.setShapeRenderer(shapeRenderer);
-		renderController.setBatch(batch);
+		renderController.setBatch(entityBatch);
 		renderController.setFont(font);
 
 		zoomInputProccesor = new ZoomInputProccesor(camera);
@@ -71,37 +77,35 @@ public class Game extends ApplicationAdapter {
 	}
 
 	private void setProjectionMatrix() {
-		batch.setProjectionMatrix(camera.combined);
+		entityBatch.setProjectionMatrix(camera.combined);
 		shapeRenderer.setProjectionMatrix(camera.combined);
 	}
 
 	private void draw() {
 		clear(1, 1, 1, 1);
+
+		drawEntities();
+
+		drawMenu();
+	}
+
+	private void drawMenu() {
+		statisticBatch.begin();
+
+		font.setColor(BLACK);
+		font.draw(statisticBatch, String.format("Dead/Alive: %s/%s", context.deadKioskCount(), context.getKioskCount() - context.deadKioskCount()), 10, 20);
+		font.draw(statisticBatch, String.format("Max Kiosk Level: %s", context.getMaxKioskLevel()), 10, 50);
+		font.draw(statisticBatch, String.format("Customers: %s", context.getCustomerCount()), 10, 80);
+
+		statisticBatch.end();
+	}
+
+	private void drawEntities() {
 		shapeRenderer.begin(Filled);
 		entitiesHolder.getEntities().forEachRemaining(entity -> {
-			if (entity instanceof Kiosk) {
-				drawKiosk((Kiosk) entity);
-			} else if (entity instanceof Customer) {
-				drawCustomer(((Customer) entity));
-			}
+			renderController.render(entity);
 		});
 		shapeRenderer.end();
-	}
-
-	private void drawCustomer(Customer entity) {
-		renderController.render(context.getContext(entity));
-	}
-
-	private void drawKiosk(Kiosk entity) {
-		renderController.render(context.getContext(entity));
-	}
-
-	private void processRestart() {
-		if (Gdx.input.isKeyJustPressed(R)) {
-			context.reinit();
-			zoomInputProccesor.init();
-			camera.position.set(camera.viewportWidth / 2, camera.viewportHeight / 2, 0);
-		}
 	}
 
 	private void processInput() {
@@ -109,12 +113,9 @@ public class Game extends ApplicationAdapter {
 		processCameraControl();
 	}
 
-	private void processZoom() {
-		boolean mKeyPressed = Gdx.input.isKeyJustPressed(Input.Keys.M);
-		boolean nKeyPressed = Gdx.input.isKeyJustPressed(Input.Keys.N);
-
-		if (mKeyPressed || nKeyPressed) {
-			zoomInputProccesor.checkZoom(mKeyPressed ? Input.Keys.M : Input.Keys.N);
+	private void processRestart() {
+		if (Gdx.input.isKeyJustPressed(R)) {
+			context.reinit();
 		}
 	}
 
@@ -130,7 +131,7 @@ public class Game extends ApplicationAdapter {
 			camera.position.set(new Vector3());
 		}
 
-		int move = 50;
+		int move = 25;
 		if (Gdx.input.isKeyPressed(Input.Keys.W)) {
 			camera.position.set(camera.position.x, camera.position.y + move, camera.position.z);
 		}
@@ -148,10 +149,19 @@ public class Game extends ApplicationAdapter {
 		}
 	}
 
+	private void processZoom() {
+		boolean mKeyPressed = Gdx.input.isKeyJustPressed(Input.Keys.M);
+		boolean nKeyPressed = Gdx.input.isKeyJustPressed(Input.Keys.N);
+
+		if (mKeyPressed || nKeyPressed) {
+			zoomInputProccesor.checkZoom(mKeyPressed ? Input.Keys.M : Input.Keys.N);
+		}
+	}
+
 
 	@Override
 	public void dispose() {
-		batch.dispose();
+		entityBatch.dispose();
 		shapeRenderer.dispose();
 	}
 
@@ -168,7 +178,7 @@ public class Game extends ApplicationAdapter {
 
 	@Bean
 	public SpriteBatch spriteBatch() {
-		return batch;
+		return entityBatch;
 	}
 
 	@Bean

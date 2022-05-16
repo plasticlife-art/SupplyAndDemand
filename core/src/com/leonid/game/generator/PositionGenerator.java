@@ -6,6 +6,7 @@ import org.springframework.stereotype.Component;
 import java.util.Random;
 
 import static java.lang.Math.round;
+import static java.lang.Math.sqrt;
 
 /**
  * @author Leonid Cheremshantsev
@@ -17,6 +18,14 @@ public class PositionGenerator {
 
 
     public Position generate(float w, float h) {
-        return new Position((float) random.nextInt(round(w)), (float) random.nextInt(round(h)));
+        float x;
+        float y;
+
+        do {
+            x = random.nextInt(round(w) * 2) - round(w);
+            y = random.nextInt(round(h) * 2) - round(h);
+        } while (sqrt(x * x + y * y) > h);
+
+        return new Position(x, y);
     }
 }

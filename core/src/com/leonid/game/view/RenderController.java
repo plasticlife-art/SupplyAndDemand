@@ -3,7 +3,8 @@ package com.leonid.game.view;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
-import com.leonid.game.domain.common.Context;
+import com.leonid.game.EntitiesHolder;
+import com.leonid.game.domain.common.HasPhysics;
 import com.leonid.game.view.rander.Renderer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
@@ -21,17 +22,19 @@ public class RenderController {
     @SuppressWarnings("rawtypes")
     @Autowired
     private List<Renderer> renderers;
+    @Autowired
+    private EntitiesHolder holder;
 
     private ShapeRenderer shapeRenderer;
     private SpriteBatch batch;
     private BitmapFont font;
 
     @SuppressWarnings({"unchecked", "rawtypes"})
-    public void render(Context context) {
+    public void render(HasPhysics entity) {
         for (Renderer renderer : renderers) {
-            if (renderer.support().isAssignableFrom(context.getClass())) {
-                renderer.init(shapeRenderer, batch, font);
-                renderer.render(context);
+            if (renderer.supportMasterClass(entity.getClass())) {
+                renderer.init(shapeRenderer, batch, font, holder);
+                renderer.render(entity);
             }
         }
     }

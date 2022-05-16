@@ -1,6 +1,7 @@
 package com.leonid.game.view.rander.impl;
 
 import com.badlogic.gdx.graphics.Color;
+import com.leonid.game.domain.common.HasPhysics;
 import com.leonid.game.domain.kiosk.Kiosk;
 import com.leonid.game.domain.kiosk.KioskContext;
 import com.leonid.game.view.rander.EntityRenderer;
@@ -13,12 +14,11 @@ import static com.badlogic.gdx.graphics.Color.GREEN;
  * @author Leonid Cheremshantsev
  */
 @Component
-public class KioskRenderer extends EntityRenderer<KioskContext> {
+public class KioskRenderer extends EntityRenderer<Kiosk> {
 
 
     @Override
-    public void render(KioskContext kioskContext) {
-        Kiosk kiosk = kioskContext.getMaster();
+    public void render(Kiosk kiosk) {
 
         Float x = kiosk.getPosition().getX();
         Float y = kiosk.getPosition().getY();
@@ -27,16 +27,19 @@ public class KioskRenderer extends EntityRenderer<KioskContext> {
         batch.begin();
 
         drawKiosk(kiosk);
-        drawCustomerInQueueCount(kioskContext, x, y, size);
-        drawProcessedCustomerCount(kioskContext, x, y, size);
-        drawKioskLevel(kioskContext, x, y, size);
+
+        KioskContext context = holder.getContext(kiosk);
+
+        drawCustomerInQueueCount(context, x, y, size);
+        drawProcessedCustomerCount(context, x, y, size);
+        drawKioskLevel(context, x, y, size);
 
         batch.end();
     }
 
     @Override
-    public Class<KioskContext> support() {
-        return KioskContext.class;
+    public <T2 extends HasPhysics> boolean supportMasterClass(Class<T2> tClass) {
+        return tClass.isAssignableFrom(Kiosk.class);
     }
 
     private void drawKioskLevel(KioskContext kioskContext, Float x, Float y, int size) {

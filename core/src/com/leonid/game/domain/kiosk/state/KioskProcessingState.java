@@ -75,7 +75,7 @@ public class KioskProcessingState implements State<KioskContext> {
     }
 
     private long getProcessingTime(KioskContext context) {
-        return NANOS_PER_SECOND * config.getProcessingSeconds() / context.getMaster().getLevel();
+        return (long) (NANOS_PER_SECOND * config.getProcessingSeconds() / (context.getMaster().getLevel() * 1.5));
     }
 
     private boolean inProcessingFor(long nanos) {

@@ -21,6 +21,6 @@ public class CustomerGenerator {
     private final String[] names = new String[]{"Вася", "Петя", "Денис"};
 
     public Customer generate(float w, float h) {
-        return new Customer(names[random.nextInt(names.length)], positionGenerator.generate(w, h));
+        return new Customer(names[random.nextInt(names.length)], positionGenerator.generate(2 * w, 2 * h));
     }
 }

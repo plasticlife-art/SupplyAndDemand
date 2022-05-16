@@ -15,6 +15,8 @@ import com.leonid.game.event.CustomerProcessedEvent;
 import com.leonid.game.event.KioskDeadEvent;
 import com.leonid.game.generator.CustomerGenerator;
 import com.leonid.game.generator.KioskGenerator;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.event.EventListener;
@@ -37,6 +39,8 @@ import static com.leonid.game.domain.kiosk.KioskStatus.WAITING;
 
 @Component
 public class GameContext {
+
+    private final Logger log = LoggerFactory.getLogger(GameContext.class);
 
     private final EntitiesHolder holder;
     private final KioskGenerator kioskGenerator;
@@ -102,10 +106,22 @@ public class GameContext {
 
     private int getCustomerGenerationCount() {
         if (config.getCustomerGenerationCount() == -1) {
-            return Math.max(kiosksGenerationCount, random.nextInt(Math.round(kiosksGenerationCount * config.getCustomerGenerationKioskCoef())));
+            return Math.max(kiosksGenerationCount, randomCustomerCount());
         } else {
             return config.getCustomerGenerationCount();
         }
+    }
+
+    private int randomCustomerCount() {
+        return random.nextInt(Math.round(randomCustomerBorder()));
+    }
+
+    private float randomCustomerBorder() {
+        return config.getCustomerGenerationBorder() + config.getCustomerGenerationKioskLevelCoef() * getMaxKioskLevel();
+    }
+
+    public int getMaxKioskLevel() {
+        return (int) holder.getMaxKioskLevel();
     }
 
     private void generateCustomers(int customersCount) {
@@ -198,23 +214,39 @@ public class GameContext {
     @EventListener
     public void onApplicationEvent(KioskDeadEvent event) {
 
+        log.info("Kiosk dead [{}/{}]", deadKioskCount(), kiosksGenerationCount);
+
         if (isEveryKioskDead() && autoReInitAt == null) {
             autoReInitAt = LocalTime.now().plusMinutes(1);
+            log.info("Everybody dead. Restart in 1 minute.");
         }
     }
 
     private boolean isEveryKioskDead() {
+        return deadKioskCount() == kiosksGenerationCount;
+    }
+
+    public int deadKioskCount() {
+        int count = 0;
         Iterator<HasPhysics> entities = holder.getEntities();
         while (entities.hasNext()) {
             HasPhysics entity = entities.next();
 
             if (entity instanceof Kiosk) {
                 Kiosk kiosk = (Kiosk) entity;
-                if (kiosk.getStatus() != DEAD) {
-                    return true;
+                if (kiosk.getStatus() == DEAD) {
+                    count++;
                 }
             }
         }
-        return false;
+        return count;
+    }
+
+    public int getKioskCount() {
+        return kiosksGenerationCount;
+    }
+
+    public int getCustomerCount() {
+        return holder.getCustomersCount();
     }
 }
