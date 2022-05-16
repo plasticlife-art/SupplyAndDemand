@@ -1,6 +1,6 @@
 package com.leonid.game.domain.kiosk.state;
 
-import com.leonid.game.calc.GameCalculator;
+import com.leonid.game.calc.Calculator;
 import com.leonid.game.config.Config;
 import com.leonid.game.domain.common.State;
 import com.leonid.game.domain.customer.CustomerContext;
@@ -17,6 +17,7 @@ import org.springframework.stereotype.Component;
 
 import java.time.LocalTime;
 
+import static com.leonid.game.domain.kiosk.KioskStatus.DEAD;
 import static com.leonid.game.domain.kiosk.KioskStatus.PROCESSING;
 
 /**
@@ -34,7 +35,7 @@ public class KioskProcessingState implements State<KioskContext> {
     @Autowired
     private Config config;
     @Autowired
-    private GameCalculator calculator;
+    private Calculator calculator;
 
     private final LocalTime startTime;
 
@@ -54,7 +55,7 @@ public class KioskProcessingState implements State<KioskContext> {
             app.getBean(CustomerTransitionHomeState.class, processingCustomer, processingCustomer.getMaster().getHome());
 
             CustomerContext nextCustomer = context.getProcessingCustomer();
-            if (nextCustomer != null) {
+            if (nextCustomer != null && context.getMaster().getStatus() != DEAD) {
                 app.getBean(KioskProcessingState.class, context);
             } else {
                 app.getBean(KioskWaitingState.class, context);

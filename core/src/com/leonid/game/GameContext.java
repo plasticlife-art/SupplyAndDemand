@@ -1,7 +1,7 @@
 
 package com.leonid.game;
 
-import com.leonid.game.calc.GameCalculator;
+import com.leonid.game.calc.Calculator;
 import com.leonid.game.config.Config;
 import com.leonid.game.domain.common.HasPhysics;
 import com.leonid.game.domain.customer.Customer;
@@ -48,7 +48,7 @@ public class GameContext {
     private final KioskGenerator kioskGenerator;
     private final CustomerGenerator customerGenerator;
     private final HomeGenerator homeGenerator;
-    private final GameCalculator gameCalculator;
+    private final Calculator calculator;
     private final Random random = new Random();
     private int kiosksGenerationCount;
 
@@ -65,12 +65,12 @@ public class GameContext {
                        KioskGenerator kioskGenerator,
                        CustomerGenerator customerGenerator,
                        HomeGenerator homeGenerator,
-                       GameCalculator gameCalculator) {
+                       Calculator calculator) {
         this.holder = holder;
         this.kioskGenerator = kioskGenerator;
         this.customerGenerator = customerGenerator;
         this.homeGenerator = homeGenerator;
-        this.gameCalculator = gameCalculator;
+        this.calculator = calculator;
 
         stopWatch = new StopWatch("tic");
     }
@@ -121,7 +121,7 @@ public class GameContext {
 
     private void generateCustomer(float w, float h) {
         Customer customer = customerGenerator.generate(w, h);
-        customer.setKiosk(gameCalculator.getBestKiosk(customer));
+        customer.setKiosk(calculator.getBestKiosk(customer));
         holder.addEntity(customer);
     }
 

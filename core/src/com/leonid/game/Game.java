@@ -9,6 +9,10 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.viewport.ExtendViewport;
+import com.leonid.game.calc.Calculator;
+import com.leonid.game.domain.common.HasPhysics;
+import com.leonid.game.domain.kiosk.Kiosk;
+import com.leonid.game.domain.kiosk.KioskStatus;
 import com.leonid.game.view.RenderController;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -31,6 +35,8 @@ public class Game extends ApplicationAdapter {
 	private EntitiesHolder holder;
 	@Autowired
 	private RenderController renderController;
+	@Autowired
+	private Calculator calculator;
 	private OrthographicCamera camera;
 	private SpriteBatch entityBatch;
 	private SpriteBatch statisticBatch;
@@ -106,6 +112,36 @@ public class Game extends ApplicationAdapter {
 	private void processInput() {
 		processRestart();
 		processCameraControl();
+
+		if (Gdx.input.isButtonJustPressed(Input.Buttons.LEFT)) {
+			int x = Gdx.input.getX();
+			int y = Gdx.input.getY();
+
+			Vector3 realMouse = getRealMouse(x, y);
+
+			HasPhysics entityByClick = calculator.getEntityByClick(realMouse.x, realMouse.y);
+
+			if (entityByClick instanceof Kiosk) {
+				Kiosk kiosk = (Kiosk) entityByClick;
+				KioskStatus currentStatus = kiosk.getStatus();
+
+				KioskStatus newStatus;
+
+				if (currentStatus == KioskStatus.DEAD) {
+					newStatus = KioskStatus.WAITING;
+				} else {
+					newStatus = KioskStatus.DEAD;
+				}
+
+				kiosk.setStatus(newStatus);
+			}
+		}
+	}
+
+	private Vector3 getRealMouse(float x, float y) {
+		Vector3 realMouse = new Vector3(x, y, 0);
+		camera.unproject(realMouse);
+		return realMouse;
 	}
 
 	private void processRestart() {

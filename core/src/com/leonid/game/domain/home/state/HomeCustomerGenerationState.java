@@ -1,7 +1,7 @@
 package com.leonid.game.domain.home.state;
 
 import com.leonid.game.EntitiesHolder;
-import com.leonid.game.calc.GameCalculator;
+import com.leonid.game.calc.Calculator;
 import com.leonid.game.config.Config;
 import com.leonid.game.domain.common.State;
 import com.leonid.game.domain.customer.Customer;
@@ -33,7 +33,7 @@ public class HomeCustomerGenerationState implements State<HomeContext> {
     @Autowired
     private CustomerGenerator customerGenerator;
     @Autowired
-    private GameCalculator gameCalculator;
+    private Calculator calculator;
     @Autowired
     private EntitiesHolder holder;
     @Autowired
@@ -80,7 +80,7 @@ public class HomeCustomerGenerationState implements State<HomeContext> {
 
     private void generateCustomer(Home home) {
         Customer customer = customerGenerator.generate(home);
-        customer.setKiosk(gameCalculator.getBestKiosk(customer));
+        customer.setKiosk(calculator.getBestKiosk(customer));
         holder.addEntity(customer);
     }
 }

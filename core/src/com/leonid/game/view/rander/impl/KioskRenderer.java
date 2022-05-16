@@ -1,7 +1,7 @@
 package com.leonid.game.view.rander.impl;
 
 import com.badlogic.gdx.graphics.Color;
-import com.leonid.game.calc.GameCalculator;
+import com.leonid.game.calc.Calculator;
 import com.leonid.game.domain.common.HasPhysics;
 import com.leonid.game.domain.kiosk.Kiosk;
 import com.leonid.game.domain.kiosk.KioskContext;
@@ -19,7 +19,7 @@ import static com.leonid.game.domain.kiosk.KioskStatus.DEAD;
 public class KioskRenderer extends EntityRenderer<Kiosk> {
 
     @Autowired
-    private GameCalculator calculator;
+    private Calculator calculator;
 
     @Override
     public void render(Kiosk kiosk) {

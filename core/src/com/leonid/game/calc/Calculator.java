@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 
 import static com.leonid.game.domain.kiosk.KioskStatus.DEAD;
 import static java.lang.Math.sqrt;
@@ -20,7 +21,7 @@ import static java.lang.Math.sqrt;
  */
 
 @Component
-public class GameCalculator {
+public class Calculator {
 
 
     public static final long NANOS_PER_SECOND = 1000_000_000L;
@@ -29,6 +30,21 @@ public class GameCalculator {
     private EntitiesHolder holder;
     @Autowired
     private Config config;
+
+    public HasPhysics getEntityByClick(float x, float y) {
+        Iterator<HasPhysics> entities = holder.getEntities();
+
+        while (entities.hasNext()) {
+            HasPhysics entity = entities.next();
+            if (entity instanceof Kiosk) {
+                if (getDistanceToCenter(x, y, entity.getPosition().getX(), entity.getPosition().getY()) <= entity.getSize()) {
+                    return entity;
+                }
+            }
+        }
+
+        return null;
+    }
 
     public int getKioskMaxQueue(Kiosk kiosk) {
         return Math.round(config.getKioskDefaultMaxQueue() * (1 + (kiosk.getLevel() * kiosk.getLevel() - 1) * config.getKioskMaxQueueToLevelMultiplier()));
@@ -79,14 +95,21 @@ public class GameCalculator {
 
     private float getScore(Customer customer, Kiosk kiosk) {
 
+        return getDistance(customer, kiosk);
+    }
+
+    private float getDistance(Customer customer, Kiosk kiosk) {
         Float customerX = customer.getPosition().getX();
         Float customerY = customer.getPosition().getY();
 
         Float kioskX = kiosk.getPosition().getX();
         Float kioskY = kiosk.getPosition().getY();
-        float distanceToCenter = (float) sqrt((customerX - kioskX) * (customerX - kioskX) + (customerY - kioskY) * (customerY - kioskY));
 
-        return distanceToCenter - kiosk.getSize();
+        return getDistanceToCenter(customerX, customerY, kioskX, kioskY) - kiosk.getSize();
+    }
+
+    private float getDistanceToCenter(Float customerX, Float customerY, Float kioskX, Float kioskY) {
+        return (float) sqrt((customerX - kioskX) * (customerX - kioskX) + (customerY - kioskY) * (customerY - kioskY));
     }
 
     private ArrayList<Kiosk> getKiosks() {

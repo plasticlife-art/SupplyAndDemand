@@ -1,6 +1,6 @@
 package com.leonid.game.domain.customer.state;
 
-import com.leonid.game.calc.GameCalculator;
+import com.leonid.game.calc.Calculator;
 import com.leonid.game.config.Config;
 import com.leonid.game.domain.common.State;
 import com.leonid.game.domain.customer.Customer;
@@ -29,7 +29,7 @@ public class CustomerQueueState implements State<CustomerContext> {
     @Autowired
     private Config config;
     @Autowired
-    private GameCalculator gameCalculator;
+    private Calculator calculator;
 
     private final Random random = new Random();
 
@@ -61,7 +61,7 @@ public class CustomerQueueState implements State<CustomerContext> {
     }
 
     private Kiosk calcNewBestKiosk(Customer customer) {
-        Kiosk kiosk = gameCalculator.calcBestKioskExceptHistory(customer);
+        Kiosk kiosk = calculator.calcBestKioskExceptHistory(customer);
 
         if (kiosk.getId() == -1L && customer.getKiosk() != null) {
             return customer.getKiosk();
