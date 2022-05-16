@@ -82,6 +82,7 @@ public class EntitiesHolder {
         entities.clear();
         customerContexts.clear();
         kioskContexts.clear();
+        homeContexts.clear();
     }
 
     public void addEntity(KioskContext kioskContext) {
