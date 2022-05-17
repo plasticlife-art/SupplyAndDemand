@@ -12,9 +12,13 @@ import com.badlogic.gdx.utils.viewport.ExtendViewport;
 import com.leonid.game.calc.Calculator;
 import com.leonid.game.domain.common.HasPhysics;
 import com.leonid.game.domain.kiosk.Kiosk;
+import com.leonid.game.domain.kiosk.KioskContext;
+import com.leonid.game.domain.kiosk.KioskDeadState;
 import com.leonid.game.domain.kiosk.KioskStatus;
+import com.leonid.game.domain.kiosk.state.KioskWaitingState;
 import com.leonid.game.view.RenderController;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Component;
 
@@ -33,6 +37,8 @@ public class Game extends ApplicationAdapter {
 	private GameContext context;
 	@Autowired
 	private EntitiesHolder holder;
+	@Autowired
+	private ApplicationContext app;
 	@Autowired
 	private RenderController renderController;
 	@Autowired
@@ -125,15 +131,12 @@ public class Game extends ApplicationAdapter {
 				Kiosk kiosk = (Kiosk) entityByClick;
 				KioskStatus currentStatus = kiosk.getStatus();
 
-				KioskStatus newStatus;
-
+				KioskContext kioskContext = holder.getContext(kiosk);
 				if (currentStatus == KioskStatus.DEAD) {
-					newStatus = KioskStatus.WAITING;
+					app.getBean(KioskDeadState.class, kioskContext);
 				} else {
-					newStatus = KioskStatus.DEAD;
+					app.getBean(KioskWaitingState.class, kioskContext);
 				}
-
-				kiosk.setStatus(newStatus);
 			}
 		}
 	}

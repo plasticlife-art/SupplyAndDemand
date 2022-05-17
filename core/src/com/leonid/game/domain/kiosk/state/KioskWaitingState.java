@@ -49,6 +49,7 @@ public class KioskWaitingState implements State<KioskContext> {
             context.getMaster().levelDown();
 
             if (context.getMaster().getLevel() == 0) {
+                context.getMaster().levelUp();
                 app.getBean(KioskDeadState.class, context);
                 eventPublisher.publishEvent(new KioskDeadEvent(this));
             }

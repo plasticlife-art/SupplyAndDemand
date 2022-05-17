@@ -55,10 +55,12 @@ public class KioskProcessingState implements State<KioskContext> {
             app.getBean(CustomerTransitionHomeState.class, processingCustomer, processingCustomer.getMaster().getHome());
 
             CustomerContext nextCustomer = context.getProcessingCustomer();
-            if (nextCustomer != null && context.getMaster().getStatus() != DEAD) {
-                app.getBean(KioskProcessingState.class, context);
-            } else {
-                app.getBean(KioskWaitingState.class, context);
+            if (context.getMaster().getStatus() != DEAD) {
+                if (nextCustomer != null) {
+                    app.getBean(KioskProcessingState.class, context);
+                } else {
+                    app.getBean(KioskWaitingState.class, context);
+                }
             }
         }
 

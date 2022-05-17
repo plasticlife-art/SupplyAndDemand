@@ -70,7 +70,7 @@ public class KioskRenderer extends EntityRenderer<Kiosk> {
         Float x = kiosk.getPosition().getX();
         Float y = kiosk.getPosition().getY();
 
-        Color color = YELLOW;
+        Color color;
 
         switch (kiosk.getStatus()) {
             case WAITING:
@@ -79,6 +79,11 @@ public class KioskRenderer extends EntityRenderer<Kiosk> {
             case PROCESSING:
                 color = GREEN;
                 break;
+            case DEAD:
+                color = RED;
+                break;
+            default:
+                color = YELLOW;
         }
 
         renderer.setColor(color);
