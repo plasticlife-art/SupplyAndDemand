@@ -14,7 +14,6 @@ import com.leonid.game.domain.common.HasPhysics;
 import com.leonid.game.domain.kiosk.Kiosk;
 import com.leonid.game.domain.kiosk.KioskContext;
 import com.leonid.game.domain.kiosk.KioskDeadState;
-import com.leonid.game.domain.kiosk.KioskStatus;
 import com.leonid.game.domain.kiosk.state.KioskWaitingState;
 import com.leonid.game.view.RenderController;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,6 +24,7 @@ import org.springframework.stereotype.Component;
 import static com.badlogic.gdx.Input.Keys.R;
 import static com.badlogic.gdx.graphics.Color.BLACK;
 import static com.badlogic.gdx.utils.ScreenUtils.clear;
+import static com.leonid.game.domain.kiosk.KioskStatus.DEAD;
 
 @Component
 public class Game extends ApplicationAdapter {
@@ -129,13 +129,12 @@ public class Game extends ApplicationAdapter {
 
 			if (entityByClick instanceof Kiosk) {
 				Kiosk kiosk = (Kiosk) entityByClick;
-				KioskStatus currentStatus = kiosk.getStatus();
 
 				KioskContext kioskContext = holder.getContext(kiosk);
-				if (currentStatus == KioskStatus.DEAD) {
-					app.getBean(KioskDeadState.class, kioskContext);
-				} else {
+				if (kiosk.getStatus() == DEAD) {
 					app.getBean(KioskWaitingState.class, kioskContext);
+				} else {
+					app.getBean(KioskDeadState.class, kioskContext);
 				}
 			}
 		}
