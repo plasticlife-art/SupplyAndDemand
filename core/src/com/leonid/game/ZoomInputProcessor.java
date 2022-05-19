@@ -7,14 +7,14 @@ import com.badlogic.gdx.graphics.OrthographicCamera;
 /**
  * @author Leonid Cheremshantsev
  */
-public class ZoomInputProccesor extends InputMultiplexer {
+public class ZoomInputProcessor extends InputMultiplexer {
 
     public static final float DEFAULT_ZOOM = 0.2f;
     public static final int MAX_SCALE = 1000;
 
     private final OrthographicCamera camera;
 
-    public ZoomInputProccesor(OrthographicCamera camera) {
+    public ZoomInputProcessor(OrthographicCamera camera) {
         super();
         this.camera = camera;
     }
@@ -32,12 +32,12 @@ public class ZoomInputProccesor extends InputMultiplexer {
 
     public void checkZoom(int key) {
         if (Input.Keys.N == key) {
-            camera.zoom -= 0.1;
+            camera.zoom -= 0.01;
             adjustZoom();
         }
 
         if (Input.Keys.M == key) {
-            camera.zoom += 0.1;
+            camera.zoom += 0.01;
             adjustZoom();
         }
     }

@@ -43,9 +43,14 @@ public class CustomerQueueState implements State<CustomerContext> {
 
     @Override
     public void tic(CustomerContext customerContext) {
-        if (isWaitingFor(config.getCustomerWaitingTime()) && random.nextInt(100) < config.getCustomerToGoToAnotherKioskPercent()) {
+        if (shouldGo()) {
             goToAnotherKiosk(customerContext);
         }
+    }
+
+    private boolean shouldGo() {
+        return isWaitingFor(config.getCustomerWaitingTime())
+                && random.nextInt(100) < config.getCustomerToGoToAnotherKioskPercent();
     }
 
     private void goToAnotherKiosk(CustomerContext customerContext) {

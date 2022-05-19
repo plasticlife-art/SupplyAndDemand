@@ -49,7 +49,7 @@ public class Game extends ApplicationAdapter {
 	private BitmapFont font;
 	private ExtendViewport viewport;
 	private ShapeRenderer shapeRenderer;
-	private ZoomInputProccesor zoomInputProccesor;
+	private ZoomInputProcessor zoomInputProcessor;
 
 	@Override
 	public void create() {
@@ -70,9 +70,9 @@ public class Game extends ApplicationAdapter {
 		renderController.setBatch(entityBatch);
 		renderController.setFont(font);
 
-		zoomInputProccesor = new ZoomInputProccesor(camera);
-		zoomInputProccesor.init();
-		Gdx.input.setInputProcessor(zoomInputProccesor);
+		zoomInputProcessor = new ZoomInputProcessor(camera);
+		zoomInputProcessor.init();
+		Gdx.input.setInputProcessor(zoomInputProcessor);
 	}
 
 	@Override
@@ -183,11 +183,11 @@ public class Game extends ApplicationAdapter {
 	}
 
 	private void processZoom() {
-		boolean mKeyPressed = Gdx.input.isKeyJustPressed(Input.Keys.M);
-		boolean nKeyPressed = Gdx.input.isKeyJustPressed(Input.Keys.N);
+		boolean mKeyPressed = Gdx.input.isKeyPressed(Input.Keys.M);
+		boolean nKeyPressed = Gdx.input.isKeyPressed(Input.Keys.N);
 
 		if (mKeyPressed || nKeyPressed) {
-			zoomInputProccesor.checkZoom(mKeyPressed ? Input.Keys.M : Input.Keys.N);
+			zoomInputProcessor.checkZoom(mKeyPressed ? Input.Keys.M : Input.Keys.N);
 		}
 	}
 
