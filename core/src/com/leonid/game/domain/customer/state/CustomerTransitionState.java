@@ -17,7 +17,7 @@ import static com.leonid.game.domain.customer.CustomerStatus.TRANSITION;
 
 public abstract class CustomerTransitionState implements State<CustomerContext> {
 
-    private final CustomerContext customerContext;
+    private final CustomerContext context;
     @Autowired
     protected ApplicationContext app;
     @Autowired
@@ -25,10 +25,10 @@ public abstract class CustomerTransitionState implements State<CustomerContext> 
 
     protected HasPhysics goal;
 
-    public CustomerTransitionState(CustomerContext customerContext, HasPhysics goal) {
-        this.customerContext = customerContext;
-        this.customerContext.setCustomerState(this);
-        customerContext.getMaster().setStatus(TRANSITION);
+    public CustomerTransitionState(CustomerContext context, HasPhysics goal) {
+        this.context = context;
+        this.context.setCustomerState(this);
+        context.getMaster().setStatus(TRANSITION);
 
         this.goal = goal;
     }
@@ -38,7 +38,7 @@ public abstract class CustomerTransitionState implements State<CustomerContext> 
 
     protected void move(Customer customer, HasPhysics entity) {
         Vector2 direction = getDirection(customer, entity);
-        direction.scl(getCustomerSpeedMultiplier());
+        direction.scl(getSpeedMultiplier());
 
         Vector2 position = new Vector2(customer.getPosition().getX(), customer.getPosition().getY());
         position.sub(direction);
@@ -47,14 +47,14 @@ public abstract class CustomerTransitionState implements State<CustomerContext> 
         customer.getPosition().setY(position.y);
     }
 
-    protected boolean hasSamePosition(Customer customer, HasPhysics entity) {
+    protected boolean hasSamePosition(HasPhysics e1, HasPhysics e2) {
 
-        return Math.abs(getGoalX(entity) - customer.getPosition().getX()) < getCustomerSpeedMultiplier()
-                && Math.abs(getGoalY(entity) - customer.getPosition().getY()) < getCustomerSpeedMultiplier();
+        return Math.abs(getGoalX(e2) - e1.getPosition().getX()) < getSpeedMultiplier()
+                && Math.abs(getGoalY(e2) - e1.getPosition().getY()) < getSpeedMultiplier();
     }
 
-    private float getCustomerSpeedMultiplier() {
-        return customerContext.getMaster().getSpeedMultiplier();
+    private float getSpeedMultiplier() {
+        return context.getMaster().getSpeedMultiplier();
     }
 
     private Vector2 getDirection(Customer customer, HasPhysics entity) {

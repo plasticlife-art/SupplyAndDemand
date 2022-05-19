@@ -82,6 +82,10 @@ public class RenderController {
         lastKiosksCount = 0;
 
         holder.getEntities().forEachRemaining(entity -> {
+            if (!entity.isVisible()) {
+                return;
+            }
+
             if (entity instanceof Customer) {
                 lastCustomersCount++;
             } else if (entity instanceof Home) {

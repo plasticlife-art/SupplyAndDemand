@@ -29,7 +29,7 @@ import static com.leonid.game.domain.kiosk.KioskStatus.DEAD;
 @Component
 public class Game extends ApplicationAdapter {
 
-	public static final int WIDTH = 1080 * 10;
+	public static final int WIDTH = 1080 * 4;
 	public static final int HEIGHT = WIDTH / 4 * 3;
 
 
@@ -97,10 +97,10 @@ public class Game extends ApplicationAdapter {
 
 		drawEntities();
 
-		drawMenu();
+		drawStatistic();
 	}
 
-	private void drawMenu() {
+	private void drawStatistic() {
 		statisticBatch.begin();
 
 		font.setColor(BLACK);

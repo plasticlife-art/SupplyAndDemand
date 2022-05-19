@@ -12,4 +12,6 @@ public interface HasPhysics {
     int getSize();
 
     Color getColor();
+
+    boolean isVisible();
 }

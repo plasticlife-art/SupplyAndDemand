@@ -119,12 +119,6 @@ public class GameContext {
         return (int) holder.getMaxKioskLevel();
     }
 
-    private void generateCustomer(float w, float h) {
-        Customer customer = customerGenerator.generate(w, h);
-        customer.setKiosk(calculator.getBestKiosk(customer));
-        holder.addEntity(customer);
-    }
-
     public void reinit() {
         clear();
         init();
@@ -186,7 +180,7 @@ public class GameContext {
                 return;
             }
 
-            if (customer.getCustomerStatus() == QUEUE && !kioskContext.isInQueue(customerContext)) {
+            if (customer.getStatus() == QUEUE && !kioskContext.isInQueue(customerContext)) {
                 kioskContext.putCustomer(customerContext);
             }
 

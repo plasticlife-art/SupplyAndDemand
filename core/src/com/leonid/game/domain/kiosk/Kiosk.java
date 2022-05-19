@@ -48,6 +48,11 @@ public class Kiosk implements HasPhysics {
         return color;
     }
 
+    @Override
+    public boolean isVisible() {
+        return true;
+    }
+
     public void setColor(Color color) {
         this.color = color;
     }

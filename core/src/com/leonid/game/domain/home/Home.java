@@ -28,4 +28,9 @@ public class Home implements HasPhysics {
     public Color getColor() {
         return Color.BROWN;
     }
+
+    @Override
+    public boolean isVisible() {
+        return true;
+    }
 }

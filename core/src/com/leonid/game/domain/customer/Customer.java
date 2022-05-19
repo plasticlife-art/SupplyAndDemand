@@ -9,6 +9,8 @@ import com.leonid.game.domain.kiosk.Kiosk;
 import java.util.Deque;
 import java.util.LinkedList;
 
+import static com.leonid.game.domain.customer.CustomerStatus.QUEUE;
+
 /**
  * @author Leonid Cheremshantsev
  */
@@ -16,15 +18,17 @@ public class Customer implements HasPhysics {
 
     private String name;
     private Position position;
-    private CustomerStatus customerStatus;
+    private CustomerStatus status;
     private Home home;
-    private Kiosk kiosk;
-    private Deque<Kiosk> kiosksHistory;
+    private final Deque<Kiosk> kiosksHistory;
     private float speedMultiplier;
+    private Color color;
+    private boolean visible;
 
-    public Customer(String name, Position position) {
+    public Customer(String name, Position position, Color color) {
         this.name = name;
         this.position = position;
+        this.color = color;
 
         kiosksHistory = new LinkedList<>();
     }
@@ -48,19 +52,28 @@ public class Customer implements HasPhysics {
 
     @Override
     public Color getColor() {
-        return Color.LIME;
+        return color;
+    }
+
+    @Override
+    public boolean isVisible() {
+        return status != QUEUE;
+    }
+
+    public void setVisible(boolean visible) {
+        this.visible = visible;
     }
 
     public void setPosition(Position position) {
         this.position = position;
     }
 
-    public CustomerStatus getCustomerStatus() {
-        return customerStatus;
+    public CustomerStatus getStatus() {
+        return status;
     }
 
     public void setStatus(CustomerStatus customerStatus) {
-        this.customerStatus = customerStatus;
+        this.status = customerStatus;
     }
 
     public Kiosk getKiosk() {
