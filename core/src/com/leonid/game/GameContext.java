@@ -6,10 +6,8 @@ import com.leonid.game.config.Config;
 import com.leonid.game.domain.common.HasPhysics;
 import com.leonid.game.domain.customer.Customer;
 import com.leonid.game.domain.customer.CustomerContext;
-import com.leonid.game.domain.customer.state.CustomerProcessingState;
 import com.leonid.game.domain.kiosk.Kiosk;
 import com.leonid.game.domain.kiosk.KioskContext;
-import com.leonid.game.domain.kiosk.state.KioskProcessingState;
 import com.leonid.game.domain.kiosk.state.KioskWaitingState;
 import com.leonid.game.event.CustomerComeHome;
 import com.leonid.game.event.KioskDeadEvent;
@@ -31,9 +29,7 @@ import java.util.Random;
 
 import static com.leonid.game.Game.HEIGHT;
 import static com.leonid.game.Game.WIDTH;
-import static com.leonid.game.domain.customer.CustomerStatus.QUEUE;
 import static com.leonid.game.domain.kiosk.KioskStatus.DEAD;
-import static com.leonid.game.domain.kiosk.KioskStatus.WAITING;
 
 /**
  * @author Leonid Cheremshantsev
@@ -44,7 +40,7 @@ public class GameContext {
 
     private final Logger log = LoggerFactory.getLogger(GameContext.class);
 
-    private final EntitiesHolder holder;
+    private final EntityHolder holder;
     private final KioskGenerator kioskGenerator;
     private final CustomerGenerator customerGenerator;
     private final HomeGenerator homeGenerator;
@@ -61,7 +57,7 @@ public class GameContext {
     private LocalTime printAt = LocalTime.now().plusMinutes(1);
 
 
-    public GameContext(EntitiesHolder holder,
+    public GameContext(EntityHolder holder,
                        KioskGenerator kioskGenerator,
                        CustomerGenerator customerGenerator,
                        HomeGenerator homeGenerator,
@@ -133,9 +129,6 @@ public class GameContext {
         stopWatch.start();
 
         holder.ticContexts();
-
-        recalcKioskCustomerCount();
-
         checkAutoReInit();
         stopWatch.stop();
         printPerformanceStatisticIfNeeded();
@@ -168,31 +161,6 @@ public class GameContext {
 
         return stringBuilder.reverse().toString();
     }
-
-    private void recalcKioskCustomerCount() {
-        holder.getEntities(Customer.class).forEach(customer -> {
-            KioskContext kioskContext = getContext(customer.getKiosk());
-            if (kioskContext == null || kioskContext.getMaster() == null) {
-                return;
-            }
-            CustomerContext customerContext = getContext(customer);
-            if (customerContext == null || customerContext.getMaster() == null) {
-                return;
-            }
-
-            if (customer.getStatus() == QUEUE && !kioskContext.isInQueue(customerContext)) {
-                kioskContext.putCustomer(customerContext);
-            }
-
-            CustomerContext processingCustomer = kioskContext.getProcessingCustomer();
-            if (kioskContext.getMaster().getStatus() == WAITING && processingCustomer != null) {
-                app.getBean(KioskProcessingState.class, kioskContext);
-                app.getBean(CustomerProcessingState.class, processingCustomer);
-            }
-
-        });
-    }
-
     public CustomerContext getContext(Customer customer) {
         return holder.getContext(customer);
     }

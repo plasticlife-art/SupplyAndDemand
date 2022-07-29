@@ -20,7 +20,7 @@ import java.util.concurrent.ConcurrentHashMap;
  * @author Leonid Cheremshantsev
  */
 @Component
-public class EntitiesHolder {
+public class EntityHolder {
 
 
     @Autowired

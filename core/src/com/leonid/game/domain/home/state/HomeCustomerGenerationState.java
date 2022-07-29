@@ -1,6 +1,6 @@
 package com.leonid.game.domain.home.state;
 
-import com.leonid.game.EntitiesHolder;
+import com.leonid.game.EntityHolder;
 import com.leonid.game.calc.Calculator;
 import com.leonid.game.config.Config;
 import com.leonid.game.domain.common.State;
@@ -35,7 +35,7 @@ public class HomeCustomerGenerationState implements State<HomeContext> {
     @Autowired
     private Calculator calculator;
     @Autowired
-    private EntitiesHolder holder;
+    private EntityHolder holder;
     @Autowired
     private Config config;
 

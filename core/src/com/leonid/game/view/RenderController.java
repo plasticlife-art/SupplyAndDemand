@@ -3,7 +3,7 @@ package com.leonid.game.view;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
-import com.leonid.game.EntitiesHolder;
+import com.leonid.game.EntityHolder;
 import com.leonid.game.domain.common.HasPhysics;
 import com.leonid.game.domain.customer.Customer;
 import com.leonid.game.domain.home.Home;
@@ -37,7 +37,7 @@ public class RenderController {
     @Autowired
     private List<Renderer> renderers;
     @Autowired
-    private EntitiesHolder holder;
+    private EntityHolder holder;
 
     private ShapeRenderer shapeRenderer;
     private SpriteBatch batch;

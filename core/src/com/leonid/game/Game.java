@@ -36,7 +36,7 @@ public class Game extends ApplicationAdapter {
 	@Autowired
 	private GameContext context;
 	@Autowired
-	private EntitiesHolder holder;
+	private EntityHolder holder;
 	@Autowired
 	private ApplicationContext app;
 	@Autowired

@@ -1,11 +1,14 @@
 package com.leonid.game.domain.customer.state;
 
+import com.leonid.game.EntityHolder;
 import com.leonid.game.calc.Calculator;
 import com.leonid.game.config.Config;
 import com.leonid.game.domain.common.State;
 import com.leonid.game.domain.customer.Customer;
 import com.leonid.game.domain.customer.CustomerContext;
 import com.leonid.game.domain.kiosk.Kiosk;
+import com.leonid.game.domain.kiosk.KioskContext;
+import com.leonid.game.domain.kiosk.state.KioskProcessingState;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.ApplicationContext;
@@ -16,6 +19,7 @@ import java.time.LocalTime;
 import java.util.Random;
 
 import static com.leonid.game.domain.customer.CustomerStatus.QUEUE;
+import static com.leonid.game.domain.kiosk.KioskStatus.WAITING;
 
 /**
  * @author Leonid Cheremshantsev
@@ -30,6 +34,8 @@ public class CustomerQueueState implements State<CustomerContext> {
     private Config config;
     @Autowired
     private Calculator calculator;
+    @Autowired
+    private EntityHolder holder;
 
     private final Random random = new Random();
 
@@ -43,6 +49,24 @@ public class CustomerQueueState implements State<CustomerContext> {
 
     @Override
     public void tic(CustomerContext customerContext) {
+        if (customerContext.getMaster() == null) {
+            return;
+        }
+
+        KioskContext kioskContext = holder.getContext(customerContext.getMaster().getKiosk());
+        if (kioskContext == null || kioskContext.getMaster() == null) {
+            return;
+        }
+
+        if (customerContext.getMaster().getStatus() == QUEUE && !kioskContext.isInQueue(customerContext)) {
+            kioskContext.putCustomer(customerContext);
+        }
+
+        CustomerContext processingCustomer = kioskContext.getProcessingCustomer();
+        if (kioskContext.getMaster().getStatus() == WAITING && processingCustomer != null) {
+            app.getBean(KioskProcessingState.class, kioskContext);
+            app.getBean(CustomerProcessingState.class, processingCustomer);
+        }
         if (shouldGo()) {
             goToAnotherKiosk(customerContext);
         }

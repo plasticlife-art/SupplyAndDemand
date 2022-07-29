@@ -3,7 +3,7 @@ package com.leonid.game.view.rander;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
-import com.leonid.game.EntitiesHolder;
+import com.leonid.game.EntityHolder;
 import com.leonid.game.domain.common.HasPhysics;
 
 /**
@@ -15,5 +15,5 @@ public interface Renderer<T> {
 
     <T2 extends HasPhysics> boolean supportMasterClass(Class<T2> tClass);
 
-    void init(ShapeRenderer shapeRenderer, SpriteBatch batch, BitmapFont font, EntitiesHolder holder);
+    void init(ShapeRenderer shapeRenderer, SpriteBatch batch, BitmapFont font, EntityHolder holder);
 }

@@ -1,6 +1,6 @@
 package com.leonid.game.calc;
 
-import com.leonid.game.EntitiesHolder;
+import com.leonid.game.EntityHolder;
 import com.leonid.game.config.Config;
 import com.leonid.game.domain.common.HasPhysics;
 import com.leonid.game.domain.common.Position;
@@ -27,7 +27,7 @@ public class Calculator {
     public static final long NANOS_PER_SECOND = 1000_000_000L;
 
     @Autowired
-    private EntitiesHolder holder;
+    private EntityHolder holder;
     @Autowired
     private Config config;
 
@@ -98,7 +98,7 @@ public class Calculator {
         return getDistance(customer, kiosk);
     }
 
-    private float getDistance(Customer customer, Kiosk kiosk) {
+    public float getDistance(HasPhysics customer, HasPhysics kiosk) {
         Float customerX = customer.getPosition().getX();
         Float customerY = customer.getPosition().getY();
 
@@ -108,7 +108,7 @@ public class Calculator {
         return getDistanceToCenter(customerX, customerY, kioskX, kioskY) - kiosk.getSize();
     }
 
-    private float getDistanceToCenter(Float customerX, Float customerY, Float kioskX, Float kioskY) {
+    public float getDistanceToCenter(Float customerX, Float customerY, Float kioskX, Float kioskY) {
         return (float) sqrt((customerX - kioskX) * (customerX - kioskX) + (customerY - kioskY) * (customerY - kioskY));
     }
 
