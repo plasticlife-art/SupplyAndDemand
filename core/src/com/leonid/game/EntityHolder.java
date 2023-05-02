@@ -15,6 +15,9 @@ import org.springframework.stereotype.Component;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CyclicBarrier;
+import java.util.concurrent.Executor;
+import java.util.concurrent.Executors;
 
 /**
  * @author Leonid Cheremshantsev
@@ -89,6 +92,11 @@ public class EntityHolder {
         kioskContexts.put(kioskContext.getMaster(), kioskContext);
     }
 
+    private final int THREAD_COUNT = Runtime.getRuntime().availableProcessors();
+    private final Executor executor = Executors.newFixedThreadPool(THREAD_COUNT);
+    private final CyclicBarrier barrier = new CyclicBarrier(THREAD_COUNT);
+
+
     public void ticContexts() {
         customerContexts.values().forEach(CustomerContext::tic);
         kioskContexts.values().forEach(KioskContext::tic);
@@ -121,7 +129,6 @@ public class EntityHolder {
     public int getKiosksCount() {
         return kioskContexts.size();
     }
-
 
     public int getHomeCount() {
         return homeContexts.size();

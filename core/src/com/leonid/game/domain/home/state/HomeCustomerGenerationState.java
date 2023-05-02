@@ -5,8 +5,8 @@ import com.leonid.game.calc.Calculator;
 import com.leonid.game.config.Config;
 import com.leonid.game.domain.common.State;
 import com.leonid.game.domain.customer.Customer;
-import com.leonid.game.domain.home.Home;
 import com.leonid.game.domain.home.HomeContext;
+import com.leonid.game.domain.kiosk.Kiosk;
 import com.leonid.game.generator.CustomerGenerator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
@@ -39,7 +39,7 @@ public class HomeCustomerGenerationState implements State<HomeContext> {
     @Autowired
     private Config config;
 
-    private Random random = new Random();
+    private final Random random = new Random();
     private LocalTime nextGenerationAt;
     private boolean generation = false;
 
@@ -69,18 +69,24 @@ public class HomeCustomerGenerationState implements State<HomeContext> {
         try {
             for (int i = 0; i < config.getGenerationCustomerPerHomePerTime(); i++) {
                 if (random.nextBoolean()) {
-                    generateCustomer(homeContext.getMaster());
+                    generateCustomer(homeContext);
                     TimeUnit.MILLISECONDS.sleep(250);
                 }
             }
-        } catch (InterruptedException e) {
-//                return;
+        } catch (InterruptedException ignored) {
         }
     }
 
-    private void generateCustomer(Home home) {
-        Customer customer = customerGenerator.generate(home);
-        customer.setKiosk(calculator.getBestKiosk(customer));
+    private void generateCustomer(HomeContext homeContext) {
+        Customer customer = customerGenerator.generate(homeContext.getMaster());
+        customer.setKiosk(getBestKiosk(homeContext, customer));
         holder.addEntity(customer);
+    }
+
+    private Kiosk getBestKiosk(HomeContext homeContext, Customer customer) {
+        if (homeContext.getBestKiosk() == null) {
+            homeContext.setBestKiosk(calculator.getBestKiosk(customer));
+        }
+        return homeContext.getBestKiosk();
     }
 }

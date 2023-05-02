@@ -16,9 +16,6 @@ import java.util.Random;
 
 @Component
 public class CustomerGenerator {
-
-    @Autowired
-    private PositionGenerator positionGenerator;
     @Autowired
     private Config config;
 

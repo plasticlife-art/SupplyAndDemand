@@ -56,19 +56,19 @@ public class Calculator {
     }
 
     public Kiosk calcBestKioskExcept(Customer customer, Kiosk exception) {
-        ArrayList<Kiosk> kiosks = new ArrayList<>(getKiosks());
+        ArrayList<Kiosk> kiosks = new ArrayList<>(getLiveKiosks());
         kiosks.remove(exception);
         return getBestKiosk(customer, kiosks);
     }
 
     public Kiosk calcBestKioskExceptHistory(Customer customer) {
-        ArrayList<Kiosk> kiosks = new ArrayList<>(getKiosks());
+        ArrayList<Kiosk> kiosks = new ArrayList<>(getLiveKiosks());
         kiosks.removeAll(customer.getKiosksHistory());
         return getBestKiosk(customer, kiosks);
     }
 
     public Kiosk getBestKiosk(Customer customer) {
-        return getBestKiosk(customer, getKiosks());
+        return getBestKiosk(customer, getLiveKiosks());
     }
 
     private Kiosk getBestKiosk(Customer customer, ArrayList<Kiosk> kiosks) {
@@ -108,11 +108,11 @@ public class Calculator {
         return getDistanceToCenter(customerX, customerY, kioskX, kioskY) - kiosk.getSize();
     }
 
-    public float getDistanceToCenter(Float customerX, Float customerY, Float kioskX, Float kioskY) {
+    private float getDistanceToCenter(Float customerX, Float customerY, Float kioskX, Float kioskY) {
         return (float) sqrt((customerX - kioskX) * (customerX - kioskX) + (customerY - kioskY) * (customerY - kioskY));
     }
 
-    private ArrayList<Kiosk> getKiosks() {
+    private ArrayList<Kiosk> getLiveKiosks() {
         ArrayList<Kiosk> kiosks = new ArrayList<>();
 
         holder.getEntities().forEachRemaining(entity -> {

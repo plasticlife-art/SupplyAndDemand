@@ -30,6 +30,8 @@ public class Config {
     private long kioskWaitingTime;
     private int customerSpeedMultiplier;
 
+    private int kioskLevelUpThreshold;
+
     @Bean
     public ThreadPoolTaskScheduler threadPoolTaskScheduler() {
         ThreadPoolTaskScheduler threadPoolTaskScheduler
@@ -142,5 +144,13 @@ public class Config {
 
     public void setCustomerSpeedMultiplier(int customerSpeedMultiplier) {
         this.customerSpeedMultiplier = customerSpeedMultiplier;
+    }
+
+    public int getKioskLevelUpThreshold() {
+        return kioskLevelUpThreshold;
+    }
+
+    public void setKioskLevelUpThreshold(int kioskLevelUpThreshold) {
+        this.kioskLevelUpThreshold = kioskLevelUpThreshold;
     }
 }

@@ -21,6 +21,7 @@ public class KioskContext implements Context<Kiosk> {
     private State<KioskContext> state;
     private long processed = 0;
     private int kioskMaxLevel;
+    private int levelUpThreshold;
 
     public KioskContext(Kiosk kiosk) {
         this.kiosk = kiosk;
@@ -53,7 +54,7 @@ public class KioskContext implements Context<Kiosk> {
             processed++;
         }
 
-        if (processed % 50 == 0 && kiosk.getLevel() < getKioskMaxLevel()) {
+        if (processed % levelUpThreshold == 0 && kiosk.getLevel() < getKioskMaxLevel()) {
             kiosk.levelUp();
         }
 
@@ -87,5 +88,9 @@ public class KioskContext implements Context<Kiosk> {
 
     public void setKioskMaxLevel(int kioskMaxLevel) {
         this.kioskMaxLevel = kioskMaxLevel;
+    }
+
+    public void setLevelUpThreshold(int levelUpThreshold) {
+        this.levelUpThreshold = levelUpThreshold;
     }
 }
